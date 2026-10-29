@@ -156,7 +156,7 @@ Typical agent loop:
 
 1. Agent edits code and adds tests.
 2. It calls `fang_check_diff` (`sample: 40`).
-3. Fang returns survivors such as `count > available` �?`count >= available`.
+3. Fang returns survivors such as `count > available` → `count >= available`.
 4. The agent adds the boundary test that the hint describes.
 5. It calls again. The survivor disappears; the score rises.
 
@@ -192,27 +192,36 @@ Run `python -m fang mcp .` and speak newline-delimited JSON-RPC 2.0 over stdio. 
 
 ```text
 git diff -U0
-    �? added line numbers
-    �?AST parse ──�?candidate mutations ──�?compile() check
-                                          �?valid only
-                                          �?                              one file spliced per mutant
-                                          �?                     ┌────────────────────┴────────────────────�?                     �?                                        �?             worker copy #1                            worker copy #N
-        mutate �?run suite (-x) �?restore          mutate �?run suite �?restore
-                     �?                                        �?                     └────────────────────┬────────────────────�?                                          �?                         killed / survived / timeout / crash
-                                          �?                       score, Wilson interval, HTML, JSON, MCP
+    │  added line numbers
+    ▼
+AST parse ──► candidate mutations ──► compile() check
+                                          │ valid only
+                                          ▼
+                              one file spliced per mutant
+                                          │
+                     ┌────────────────────┴────────────────────┐
+                     ▼                                         ▼
+             worker copy #1                            worker copy #N
+        mutate → run suite (-x) → restore          mutate → run suite → restore
+                     │                                         │
+                     └────────────────────┬────────────────────┘
+                                          ▼
+                         killed / survived / timeout / crash
+                                          │
+                       score, Wilson interval, HTML, JSON, MCP
 ```
 
 Mutation operators are intentionally high-signal and small in number:
 
 | Operator | Example | What a survivor usually means |
 | --- | --- | --- |
-| `comparison` | `a < b` �?`a <= b` | A boundary is untested |
-| `boolean` | `and` �?`or` | Only one side of a condition is exercised |
-| `arithmetic` | `a + b` �?`a - b` | The numeric result is not asserted exactly |
-| `constant` | `100` �?`101` | A magic value is not observed |
-| `return` | `return x` �?`return None` | The return value is ignored |
-| `conditional` | `if x:` �?`if not x:` | One branch has no test |
-| `statement` | `audit(x)` �?`pass` | A side effect is unasserted |
+| `comparison` | `a < b` → `a <= b` | A boundary is untested |
+| `boolean` | `and` → `or` | Only one side of a condition is exercised |
+| `arithmetic` | `a + b` → `a - b` | The numeric result is not asserted exactly |
+| `constant` | `100` → `101` | A magic value is not observed |
+| `return` | `return x` → `return None` | The return value is ignored |
+| `conditional` | `if x:` → `if not x:` | One branch has no test |
+| `statement` | `audit(x)` → `pass` | A side effect is unasserted |
 
 **Score.** `detected / (detected + survived)`, where detected includes kills, timeouts, and mutant-induced crashes. When sampled, the report shows a 95% Wilson interval so the number is not over-claimed.
 
@@ -284,8 +293,8 @@ Config lives in `.fang.json` at the project root. CLI flags win over config; `fa
 ```
 fang/
   source.py       byte-offset-aware source splicing
-  mutators.py     AST visitors �?compile-checked mutants
-  diffmap.py      git diff -U0 �?added lines
+  mutators.py     AST visitors → compile-checked mutants
+  diffmap.py      git diff -U0 → added lines
   discovery.py    file walking, test-runner detection
   runner.py       subprocess execution, timeouts, killer parsing
   engine.py       scope, baseline, sampling, cache, parallel workers
