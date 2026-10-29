@@ -1,0 +1,71 @@
+name: Fang mutation testing
+description: Diff-scoped mutation testing for Python. Fails the job below a mutation score and uploads an HTML report.
+author: Fang contributors
+branding:
+  icon: activity
+  color: yellow
+
+inputs:
+  path:
+    description: Project root to analyze.
+    required: false
+    default: "."
+  diff:
+    description: Git revision to diff against. Leave empty to analyze the whole project.
+    required: false
+    default: ""
+  sample:
+    description: Number of mutants to evaluate. Set to 0 for all mutants.
+    required: false
+    default: "120"
+  min-score:
+    description: Fail the job when the mutation score is below this percentage.
+    required: false
+    default: "70"
+  jobs:
+    description: Parallel workers.
+    required: false
+    default: "2"
+  paths:
+    description: Comma-separated source paths, relative to the project root.
+    required: false
+    default: ""
+  test-command:
+    description: Custom shell command used to run the test suite.
+    required: false
+    default: ""
+  report:
+    description: Path for the HTML report.
+    required: false
+    default: "fang-report.html"
+  badge:
+    description: Optional path for an SVG score badge.
+    required: false
+    default: "fang-badge.svg"
+  markdown:
+    description: Optional path for a PR-comment markdown summary.
+    required: false
+    default: "fang-comment.md"
+
+runs:
+  using: composite
+  steps:
+    - name: Install Fang
+      shell: bash
+      run: python -m pip install --disable-pip-version-check "${{ github.action_path }}"
+
+    - name: Run Fang
+      shell: bash
+      run: |
+        set -euo pipefail
+        args=(run "${{ inputs.path }}")
+        args+=(--jobs "${{ inputs.jobs }}")
+        args+=(--min-score "${{ inputs.min-score }}")
+        args+=(--report "${{ inputs.report }}")
+        if [[ -n "${{ inputs.diff }}" ]]; then args+=(--diff "${{ inputs.diff }}"); fi
+        if [[ "${{ inputs.sample }}" != "0" ]]; then args+=(--sample "${{ inputs.sample }}"); fi
+        if [[ -n "${{ inputs.paths }}" ]]; then args+=(--paths "${{ inputs.paths }}"); fi
+        if [[ -n "${{ inputs.test-command }}" ]]; then args+=(--test-command "${{ inputs.test-command }}"); fi
+        if [[ -n "${{ inputs.badge }}" ]]; then args+=(--badge "${{ inputs.badge }}"); fi
+        if [[ -n "${{ inputs.markdown }}" ]]; then args+=(--markdown "${{ inputs.markdown }}"); fi
+        python -m fang "${args[@]}"

@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fang 61.9% mutation report</title>
+<style>
+:root{
+  --bg:#080a0f; --panel:#0f1219; --panel2:#141925; --line:rgba(255,255,255,.075);
+  --text:#e9ecf4; --muted:#8d94a7; --acid:#c8ff4d; --red:#ff6b6b; --amber:#ffc857;
+  --green:#5ee39a; --blue:#6cc7ff; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0;background:
+  radial-gradient(1100px 520px at 12% -12%,rgba(200,255,77,.10),transparent 62%),
+  radial-gradient(900px 520px at 96% 0%,rgba(108,199,255,.07),transparent 60%),
+  var(--bg);
+  color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--acid)}
+.wrap{max-width:1120px;margin:0 auto;padding:34px 24px 70px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:34px}
+.brand{display:flex;align-items:center;gap:14px}
+.mark{width:42px;height:42px;border-radius:12px;background:var(--acid);display:grid;place-items:center;color:#080a0f;font-family:var(--mono);font-weight:800;font-size:21px;box-shadow:0 0 40px rgba(200,255,77,.28)}
+.wordmark{font-family:var(--mono);font-size:20px;font-weight:700;letter-spacing:.16em}
+.tagline{color:var(--muted);font-size:12.5px;letter-spacing:.04em}
+.meta{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-align:right;line-height:1.7}
+.meta strong{color:var(--text);font-weight:500}
+h1{font-size:clamp(28px,4vw,44px);line-height:1.1;margin:0 0 8px;letter-spacing:-.02em;font-weight:650}
+.sub{color:var(--muted);margin:0 0 30px;max-width:70ch}
+.hero{display:grid;grid-template-columns:270px 1fr;gap:18px;align-items:stretch;margin-bottom:18px}
+.scorecard{background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.012));border:1px solid var(--line);border-radius:20px;padding:26px 22px;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden}
+.scorecard:after{content:"";position:absolute;inset:auto -40px -70px -40px;height:120px;background:radial-gradient(closest-side,rgba(200,255,77,.18),transparent)}
+.ring{position:relative;width:196px;height:196px}
+.ring svg{transform:rotate(-90deg);width:196px;height:196px}
+.ring .track{stroke:rgba(255,255,255,.07);stroke-width:10;fill:none}
+.ring .value{stroke:var(--acid);stroke-width:10;fill:none;stroke-linecap:round;stroke-dasharray:0 999;transition:stroke-dasharray 1.2s cubic-bezier(.2,.7,.2,1)}
+.ring .center{position:absolute;inset:0;display:grid;place-content:center;gap:2px}
+.big{font-family:var(--mono);font-size:42px;font-weight:700;letter-spacing:-.04em;line-height:1}
+.big span{font-size:18px;color:var(--muted);margin-left:2px}
+.grade{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 16px 14px;min-width:0}
+.stat .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;color:var(--muted);text-transform:uppercase}
+.stat .v{font-family:var(--mono);font-size:27px;font-weight:650;margin-top:6px;letter-spacing:-.03em}
+.stat .n{font-size:11.5px;color:var(--muted);margin-top:2px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin:18px 0}
+.panel h2{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 14px;font-weight:600}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:26px 0 14px}
+.chip{appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:7px 12px;font-family:var(--mono);font-size:11.5px;cursor:pointer;transition:.15s}
+.chip:hover{border-color:rgba(255,255,255,.22);color:var(--text)}
+.chip[aria-pressed="true"]{background:var(--text);color:#080a0f;border-color:var(--text)}
+.chip .c{opacity:.55;margin-left:4px}
+.search{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;min-width:230px}
+.search span{color:var(--muted);font-family:var(--mono);font-size:12px}
+.search input{all:unset;color:var(--text);font-family:var(--mono);font-size:12px;width:100%}
+.search input::placeholder{color:#5c6273}
+.list{display:grid;gap:12px}
+.mutant{background:linear-gradient(180deg,rgba(255,255,255,.028),rgba(255,255,255,.008));border:1px solid var(--line);border-radius:15px;padding:15px 17px}
+.mutant[data-status="survived"]{border-left:3px solid var(--red)}
+.mutant[data-status="killed"]{border-left:3px solid rgba(94,227,154,.55)}
+.mutant[data-status="timeout"]{border-left:3px solid var(--amber)}
+.m-head{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-bottom:10px}
+.loc{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--text)}
+.ctx{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.op{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);border:1px solid rgba(108,199,255,.25);background:rgba(108,199,255,.07);border-radius:6px;padding:2px 6px}
+.status{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+.status.survived{color:var(--red);background:rgba(255,107,107,.09);border:1px solid rgba(255,107,107,.3)}
+.status.killed{color:var(--green);background:rgba(94,227,154,.07);border:1px solid rgba(94,227,154,.24)}
+.status.timeout{color:var(--amber);background:rgba(255,200,87,.08);border:1px solid rgba(255,200,87,.28)}
+.status.error,.status.worker_error{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--line)}
+pre.diff{margin:0 0 10px;background:#07090d;border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:11px 13px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+.del{display:block;color:#ff8b8b;white-space:pre-wrap;word-break:break-word}
+.add{display:block;color:#8dffc0;white-space:pre-wrap;word-break:break-word}
+body[data-filter="survived"] .mutant:not([data-status="survived"]),
+body[data-filter="killed"] .mutant:not([data-status="killed"]),
+body[data-filter="timeout"] .mutant:not([data-status="timeout"]),
+body[data-filter="error"] .mutant:not([data-status="error"]),
+body[data-filter="worker_error"] .mutant:not([data-status="worker_error"]){display:none}
+.desc{font-family:var(--mono);font-size:12px;color:#c3c9d8;margin:0 0 5px;word-break:break-word}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.m-foot{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:11px;font-family:var(--mono);font-size:11px;color:#697086}
+.copy{appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:3px 7px;font-family:var(--mono);font-size:10.5px;cursor:pointer}
+.copy:hover{color:var(--text);border-color:rgba(255,255,255,.24)}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
+th{color:var(--muted);font-weight:500;text-align:left;letter-spacing:.06em;text-transform:uppercase;font-size:10px;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid rgba(255,255,255,.04)}
+td.num{text-align:right}
+.fbar{height:7px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;min-width:90px}
+.fbar i{display:block;height:100%;background:var(--acid);border-radius:99px}
+details.learn{margin-top:18px;color:var(--muted);font-size:13.5px}
+details.learn summary{cursor:pointer;color:var(--text);font-family:var(--mono);font-size:12px;letter-spacing:.06em}
+details.learn p{max-width:85ch}
+footer.end{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;color:#5f6575;font-family:var(--mono);font-size:10.5px}
+.note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+.note b{color:var(--amber);font-weight:500}
+@media(max-width:860px){.hero{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.search{margin-left:0;width:100%}.wrap{padding:22px 16px 50px}}
+@media print{body{background:#fff;color:#111}.mutant,.panel,.stat{break-inside:avoid}.toolbar,.copy{display:none}}
+</style>
+</head>
+<body data-filter="survived">
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">F</div>
+      <div>
+        <div class="wordmark">FANG</div>
+        <div class="tagline">your tests pass. do they bite?</div>
+      </div>
+    </div>
+    <div class="meta"><strong>examples/shop</strong><br>all &middot; 2026-10-29T04:28:21+00:00<br>10 tests &middot; 0.33s suite</div>
+  </header>
+
+  <h1>61.9% mutation score</h1>
+  <p class="sub">Scope: all files · 63 mutants generated · 10 tests collected</p>
+
+  <section class="hero">
+    <div class="scorecard">
+      <div class="ring">
+        <svg viewBox="0 0 196 196" aria-hidden="true">
+          <circle class="track" cx="98" cy="98" r="82"></circle>
+          <circle class="value" cx="98" cy="98" r="82" style="stroke:#ffc857;stroke-dasharray:318.9 196.3"></circle>
+        </svg>
+        <div class="center"><div class="big">61.9<span>%</span></div><div class="grade">C · thin</div></div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">killed</div><div class="v" style="color:var(--green)">39</div><div class="n">mutants your tests noticed</div></div>
+      <div class="stat"><div class="k">survived</div><div class="v" style="color:var(--red)">24</div><div class="n">behaviour changes left unchecked</div></div>
+      <div class="stat"><div class="k">mutants</div><div class="v">63</div><div class="n">of 63 generated</div></div>
+      <div class="stat"><div class="k">run time</div><div class="v">7.8s</div><div class="n">0.33s baseline</div></div>
+    </div>
+  </section>
+
+  <section class="toolbar" aria-label="Filters">
+    <button class="chip" data-filter="all" aria-pressed="false">all<span class="c">63</span></button><button class="chip" data-filter="survived" aria-pressed="true">survived<span class="c">24</span></button><button class="chip" data-filter="killed" aria-pressed="false">killed<span class="c">39</span></button>
+    <label class="search"><span>/</span><input id="q" type="search" placeholder="filter by file, function, test..." autocomplete="off"></label>
+  </section>
+  <p class="note" style="margin:-4px 0 14px">Showing <b id="visible-count">24</b> mutants. Press <code>/</code> to search, <code>Esc</code> to reset.</p>
+
+  <section class="list" aria-label="Mutants">
+<article class="mutant" data-status="survived" data-search="shop/cart.py 17 cart.add comparison survived `&lt;=` -&gt; `&lt;` in `quantity &lt;= 0` add a test at the boundary where this comparison flips.         if quantity &lt;= 0:         if quantity &lt; 0: ">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:17</span>
+    <span class="ctx">Cart.add</span>
+    <span class="op">comparison</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- if quantity &lt;= 0:</span><span class="add">+ if quantity &lt; 0:</span></pre>
+  <p class="desc">`&lt;=` -&gt; `&lt;` in `quantity &lt;= 0`</p>
+  <p class="hint">Add a test at the boundary where this comparison flips.</p>
+  <div class="m-foot"> <span>0.36s</span>  <button class="copy" data-copy="Add a test at the boundary where this comparison flips.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/cart.py 18 cart.add constant survived string &#x27;quantity must be positive&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.             raise valueerror(&quot;quantity must be positive&quot;)             raise valueerror(&quot;&quot;) ">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:18</span>
+    <span class="ctx">Cart.add</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- raise ValueError(&quot;quantity must be positive&quot;)</span><span class="add">+ raise ValueError(&quot;&quot;)</span></pre>
+  <p class="desc">string &#x27;quantity must be positive&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.36s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/cart.py 19 cart.add constant survived string &#x27;sku&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.         self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: quantity})         self.items.append({&quot;&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: quantity}) ">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:19</span>
+    <span class="ctx">Cart.add</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: quantity})</span><span class="add">+ self.items.append({&quot;&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: quantity})</span></pre>
+  <p class="desc">string &#x27;sku&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.38s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/cart.py 23 cart.subtotal constant survived `2` -&gt; `3` assert against a different value so this constant is observable.             sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 2             sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 3 ">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:23</span>
+    <span class="ctx">Cart.subtotal</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 2</span><span class="add">+ sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 3</span></pre>
+  <p class="desc">`2` -&gt; `3`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.45s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/cart.py 30 cart.total constant survived `2` -&gt; `3` assert against a different value so this constant is observable.         return round(subtotal - discount + shipping, 2)         return round(subtotal - discount + shipping, 3) ">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:30</span>
+    <span class="ctx">Cart.total</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(subtotal - discount + shipping, 2)</span><span class="add">+ return round(subtotal - discount + shipping, 3)</span></pre>
+  <p class="desc">`2` -&gt; `3`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.45s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/inventory.py 13 inventory.add comparison survived `&lt;` -&gt; `&lt;=` in `count &lt; 0` add a test at the boundary where this comparison flips.         if count &lt; 0:         if count &lt;= 0: ">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:13</span>
+    <span class="ctx">Inventory.add</span>
+    <span class="op">comparison</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- if count &lt; 0:</span><span class="add">+ if count &lt;= 0:</span></pre>
+  <p class="desc">`&lt;` -&gt; `&lt;=` in `count &lt; 0`</p>
+  <p class="hint">Add a test at the boundary where this comparison flips.</p>
+  <div class="m-foot"> <span>0.47s</span>  <button class="copy" data-copy="Add a test at the boundary where this comparison flips.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/inventory.py 13 inventory.add constant survived `0` -&gt; `1` assert against a different value so this constant is observable.         if count &lt; 0:         if count &lt; 1: ">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:13</span>
+    <span class="ctx">Inventory.add</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- if count &lt; 0:</span><span class="add">+ if count &lt; 1:</span></pre>
+  <p class="desc">`0` -&gt; `1`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.48s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/inventory.py 14 inventory.add constant survived string &#x27;cannot add a negative count&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.             raise valueerror(&quot;cannot add a negative count&quot;)             raise valueerror(&quot;&quot;) ">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:14</span>
+    <span class="ctx">Inventory.add</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- raise ValueError(&quot;cannot add a negative count&quot;)</span><span class="add">+ raise ValueError(&quot;&quot;)</span></pre>
+  <p class="desc">string &#x27;cannot add a negative count&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.45s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/inventory.py 18 inventory.take constant survived `0` -&gt; `1` assert against a different value so this constant is observable.         available = self.stock.get(sku, 0)         available = self.stock.get(sku, 1) ">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:18</span>
+    <span class="ctx">Inventory.take</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- available = self.stock.get(sku, 0)</span><span class="add">+ available = self.stock.get(sku, 1)</span></pre>
+  <p class="desc">`0` -&gt; `1`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.48s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/inventory.py 19 inventory.take comparison survived `&gt;` -&gt; `&gt;=` in `count &gt; available` add a test at the boundary where this comparison flips.         if count &gt; available:         if count &gt;= available: ">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:19</span>
+    <span class="ctx">Inventory.take</span>
+    <span class="op">comparison</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- if count &gt; available:</span><span class="add">+ if count &gt;= available:</span></pre>
+  <p class="desc">`&gt;` -&gt; `&gt;=` in `count &gt; available`</p>
+  <p class="hint">Add a test at the boundary where this comparison flips.</p>
+  <div class="m-foot"> <span>0.47s</span>  <button class="copy" data-copy="Add a test at the boundary where this comparison flips.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/inventory.py 22 inventory.take return survived `return true` -&gt; `return none` assert the return value; calling the function is not enough.         return true         return none ">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:22</span>
+    <span class="ctx">Inventory.take</span>
+    <span class="op">return</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return True</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return True` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"> <span>0.47s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/inventory.py 22 inventory.take constant survived `true` -&gt; `false` assert against a different value so this constant is observable.         return true         return false ">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:22</span>
+    <span class="ctx">Inventory.take</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return True</span><span class="add">+ return False</span></pre>
+  <p class="desc">`True` -&gt; `False`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.48s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/inventory.py 25 inventory.available constant survived `0` -&gt; `1` assert against a different value so this constant is observable.         return self.stock.get(sku, 0)         return self.stock.get(sku, 1) ">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:25</span>
+    <span class="ctx">Inventory.available</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return self.stock.get(sku, 0)</span><span class="add">+ return self.stock.get(sku, 1)</span></pre>
+  <p class="desc">`0` -&gt; `1`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.47s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/pricing.py 5  constant survived `100.0` -&gt; `101.0` assert against a different value so this constant is observable. free_shipping_threshold = 100.0 free_shipping_threshold = 101.0 ">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:5</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- FREE_SHIPPING_THRESHOLD = 100.0</span><span class="add">+ FREE_SHIPPING_THRESHOLD = 101.0</span></pre>
+  <p class="desc">`100.0` -&gt; `101.0`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.49s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/pricing.py 6  constant survived `9.99` -&gt; `10.99` assert against a different value so this constant is observable. express_fee = 9.99 express_fee = 10.99 ">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:6</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- EXPRESS_FEE = 9.99</span><span class="add">+ EXPRESS_FEE = 10.99</span></pre>
+  <p class="desc">`9.99` -&gt; `10.99`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.50s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/pricing.py 10  constant survived string &#x27;basic&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     &quot;basic&quot;: 0.0,     &quot;&quot;: 0.0, ">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:10</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;basic&quot;: 0.0,</span><span class="add">+ &quot;&quot;: 0.0,</span></pre>
+  <p class="desc">string &#x27;basic&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.48s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/pricing.py 12  constant survived string &#x27;gold&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     &quot;gold&quot;: 0.10,     &quot;&quot;: 0.10, ">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:12</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;gold&quot;: 0.10,</span><span class="add">+ &quot;&quot;: 0.10,</span></pre>
+  <p class="desc">string &#x27;gold&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.45s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/pricing.py 12  constant survived `0.1` -&gt; `1.1` assert against a different value so this constant is observable.     &quot;gold&quot;: 0.10,     &quot;gold&quot;: 1.1, ">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:12</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;gold&quot;: 0.10,</span><span class="add">+ &quot;gold&quot;: 1.1,</span></pre>
+  <p class="desc">`0.1` -&gt; `1.1`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.45s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/pricing.py 18 discount_rate constant survived `0.0` -&gt; `1.0` assert against a different value so this constant is observable.     return tier_rates.get(tier, 0.0)     return tier_rates.get(tier, 1.0) ">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:18</span>
+    <span class="ctx">discount_rate</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return TIER_RATES.get(tier, 0.0)</span><span class="add">+ return TIER_RATES.get(tier, 1.0)</span></pre>
+  <p class="desc">`0.0` -&gt; `1.0`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.44s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/pricing.py 23 discount_for comparison survived `&gt;=` -&gt; `&gt;` in `total &gt;= free_shipping_threshold` add a test at the boundary where this comparison flips.     if total &gt;= free_shipping_threshold and tier == &quot;gold&quot;:     if total &gt; free_shipping_threshold and tier == &quot;gold&quot;: ">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:23</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">comparison</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- if total &gt;= FREE_SHIPPING_THRESHOLD and tier == &quot;gold&quot;:</span><span class="add">+ if total &gt; FREE_SHIPPING_THRESHOLD and tier == &quot;gold&quot;:</span></pre>
+  <p class="desc">`&gt;=` -&gt; `&gt;` in `total &gt;= FREE_SHIPPING_THRESHOLD`</p>
+  <p class="hint">Add a test at the boundary where this comparison flips.</p>
+  <div class="m-foot"> <span>0.38s</span>  <button class="copy" data-copy="Add a test at the boundary where this comparison flips.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/pricing.py 24 discount_for constant survived `2` -&gt; `3` assert against a different value so this constant is observable.         return round(total * 0.15, 2)         return round(total * 0.15, 3) ">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:24</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(total * 0.15, 2)</span><span class="add">+ return round(total * 0.15, 3)</span></pre>
+  <p class="desc">`2` -&gt; `3`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.38s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/pricing.py 25 discount_for constant survived `2` -&gt; `3` assert against a different value so this constant is observable.     return round(total * discount_rate(tier), 2)     return round(total * discount_rate(tier), 3) ">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:25</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(total * discount_rate(tier), 2)</span><span class="add">+ return round(total * discount_rate(tier), 3)</span></pre>
+  <p class="desc">`2` -&gt; `3`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.38s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/pricing.py 31 shipping_fee return survived `return express_fee` -&gt; `return none` assert the return value; calling the function is not enough.         return express_fee         return none ">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:31</span>
+    <span class="ctx">shipping_fee</span>
+    <span class="op">return</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return EXPRESS_FEE</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return EXPRESS_FEE` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"> <span>0.38s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="shop/pricing.py 32 shipping_fee comparison survived `&gt;=` -&gt; `&gt;` in `total &gt;= free_shipping_threshold` add a test at the boundary where this comparison flips.     if total &gt;= free_shipping_threshold:     if total &gt; free_shipping_threshold: ">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:32</span>
+    <span class="ctx">shipping_fee</span>
+    <span class="op">comparison</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- if total &gt;= FREE_SHIPPING_THRESHOLD:</span><span class="add">+ if total &gt; FREE_SHIPPING_THRESHOLD:</span></pre>
+  <p class="desc">`&gt;=` -&gt; `&gt;` in `total &gt;= FREE_SHIPPING_THRESHOLD`</p>
+  <p class="hint">Add a test at the boundary where this comparison flips.</p>
+  <div class="m-foot"> <span>0.36s</span>  <button class="copy" data-copy="Add a test at the boundary where this comparison flips.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 17 cart.add conditional killed negate condition `quantity &lt;= 0` test the branch this condition guards, not only the happy path.         if quantity &lt;= 0:         if not (quantity &lt;= 0): tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:17</span>
+    <span class="ctx">Cart.add</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if quantity &lt;= 0:</span><span class="add">+ if not (quantity &lt;= 0):</span></pre>
+  <p class="desc">negate condition `quantity &lt;= 0`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.39s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 17 cart.add constant killed `0` -&gt; `1` assert against a different value so this constant is observable.         if quantity &lt;= 0:         if quantity &lt;= 1: tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:17</span>
+    <span class="ctx">Cart.add</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if quantity &lt;= 0:</span><span class="add">+ if quantity &lt;= 1:</span></pre>
+  <p class="desc">`0` -&gt; `1`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.38s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 19 cart.add statement killed remove `self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: qu...` assert the side effect of this call (state, output, or log).         self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: quantity})         pass tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:19</span>
+    <span class="ctx">Cart.add</span>
+    <span class="op">statement</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: quantity})</span><span class="add">+ pass</span></pre>
+  <p class="desc">remove `self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: qu...`</p>
+  <p class="hint">Assert the side effect of this call (state, output, or log).</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.42s</span>  <button class="copy" data-copy="Assert the side effect of this call (state, output, or log).">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 19 cart.add constant killed string &#x27;price&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.         self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: quantity})         self.items.append({&quot;sku&quot;: sku, &quot;&quot;: price, &quot;quantity&quot;: quantity}) tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:19</span>
+    <span class="ctx">Cart.add</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: quantity})</span><span class="add">+ self.items.append({&quot;sku&quot;: sku, &quot;&quot;: price, &quot;quantity&quot;: quantity})</span></pre>
+  <p class="desc">string &#x27;price&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.42s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 19 cart.add constant killed string &#x27;quantity&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.         self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: quantity})         self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;&quot;: quantity}) tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:19</span>
+    <span class="ctx">Cart.add</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;quantity&quot;: quantity})</span><span class="add">+ self.items.append({&quot;sku&quot;: sku, &quot;price&quot;: price, &quot;&quot;: quantity})</span></pre>
+  <p class="desc">string &#x27;quantity&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.41s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 22 cart.subtotal return killed `return round( sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]...` -&gt; `return none` assert the return value; calling the function is not enough.         return round(  tests/test_cart.py::testcart::test_empty_cart">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:22</span>
+    <span class="ctx">Cart.subtotal</span>
+    <span class="op">return</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(
+            sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 2
+        )</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return round( sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]...` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_empty_cart</b></span> <span>0.50s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 23 cart.subtotal constant killed string &#x27;price&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.             sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 2             sum(float(item[&quot;&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 2 tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:23</span>
+    <span class="ctx">Cart.subtotal</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 2</span><span class="add">+ sum(float(item[&quot;&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 2</span></pre>
+  <p class="desc">string &#x27;price&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.48s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 23 cart.subtotal arithmetic killed `*` -&gt; `/` in `float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;])` assert the exact numeric result, not just its type.             sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 2             sum(float(item[&quot;price&quot;]) / int(item[&quot;quantity&quot;]) for item in self.items), 2 tests/test_cart.py::testcart::test_total_adds_shipping">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:23</span>
+    <span class="ctx">Cart.subtotal</span>
+    <span class="op">arithmetic</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 2</span><span class="add">+ sum(float(item[&quot;price&quot;]) / int(item[&quot;quantity&quot;]) for item in self.items), 2</span></pre>
+  <p class="desc">`*` -&gt; `/` in `float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;])`</p>
+  <p class="hint">Assert the exact numeric result, not just its type.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_total_adds_shipping</b></span> <span>0.50s</span>  <button class="copy" data-copy="Assert the exact numeric result, not just its type.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 23 cart.subtotal constant killed string &#x27;quantity&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.             sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 2             sum(float(item[&quot;price&quot;]) * int(item[&quot;&quot;]) for item in self.items), 2 tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:23</span>
+    <span class="ctx">Cart.subtotal</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- sum(float(item[&quot;price&quot;]) * int(item[&quot;quantity&quot;]) for item in self.items), 2</span><span class="add">+ sum(float(item[&quot;price&quot;]) * int(item[&quot;&quot;]) for item in self.items), 2</span></pre>
+  <p class="desc">string &#x27;quantity&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.50s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 30 cart.total return killed `return round(subtotal - discount + shipping, 2)` -&gt; `return none` assert the return value; calling the function is not enough.         return round(subtotal - discount + shipping, 2)         return none tests/test_cart.py::testcart::test_empty_cart">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:30</span>
+    <span class="ctx">Cart.total</span>
+    <span class="op">return</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(subtotal - discount + shipping, 2)</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return round(subtotal - discount + shipping, 2)` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_empty_cart</b></span> <span>0.50s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 30 cart.total arithmetic killed `-` -&gt; `+` in `subtotal - discount` assert the exact numeric result, not just its type.         return round(subtotal - discount + shipping, 2)         return round(subtotal + discount + shipping, 2) tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:30</span>
+    <span class="ctx">Cart.total</span>
+    <span class="op">arithmetic</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(subtotal - discount + shipping, 2)</span><span class="add">+ return round(subtotal + discount + shipping, 2)</span></pre>
+  <p class="desc">`-` -&gt; `+` in `subtotal - discount`</p>
+  <p class="hint">Assert the exact numeric result, not just its type.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.52s</span>  <button class="copy" data-copy="Assert the exact numeric result, not just its type.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 30 cart.total arithmetic killed `+` -&gt; `-` in `subtotal - discount + shipping` assert the exact numeric result, not just its type.         return round(subtotal - discount + shipping, 2)         return round(subtotal - discount - shipping, 2) tests/test_cart.py::testcart::test_empty_cart">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:30</span>
+    <span class="ctx">Cart.total</span>
+    <span class="op">arithmetic</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(subtotal - discount + shipping, 2)</span><span class="add">+ return round(subtotal - discount - shipping, 2)</span></pre>
+  <p class="desc">`+` -&gt; `-` in `subtotal - discount + shipping`</p>
+  <p class="hint">Assert the exact numeric result, not just its type.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_empty_cart</b></span> <span>0.51s</span>  <button class="copy" data-copy="Assert the exact numeric result, not just its type.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/cart.py 33 cart.__len__ return killed `return len(self.items)` -&gt; `return none` assert the return value; calling the function is not enough.         return len(self.items)         return none tests/test_cart.py::testcart::test_len">
+  <div class="m-head">
+    <span class="loc">shop/cart.py:33</span>
+    <span class="ctx">Cart.__len__</span>
+    <span class="op">return</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return len(self.items)</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return len(self.items)` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_len</b></span> <span>0.50s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/inventory.py 13 inventory.add conditional killed negate condition `count &lt; 0` test the branch this condition guards, not only the happy path.         if count &lt; 0:         if not (count &lt; 0): tests/test_inventory.py::testinventory::test_add_and_take">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:13</span>
+    <span class="ctx">Inventory.add</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if count &lt; 0:</span><span class="add">+ if not (count &lt; 0):</span></pre>
+  <p class="desc">negate condition `count &lt; 0`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_inventory.py::TestInventory::test_add_and_take</b></span> <span>0.50s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/inventory.py 15 inventory.add constant killed `0` -&gt; `1` assert against a different value so this constant is observable.         self.stock[sku] = self.stock.get(sku, 0) + count         self.stock[sku] = self.stock.get(sku, 1) + count tests/test_inventory.py::testinventory::test_add_and_take">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:15</span>
+    <span class="ctx">Inventory.add</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- self.stock[sku] = self.stock.get(sku, 0) + count</span><span class="add">+ self.stock[sku] = self.stock.get(sku, 1) + count</span></pre>
+  <p class="desc">`0` -&gt; `1`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_inventory.py::TestInventory::test_add_and_take</b></span> <span>0.50s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/inventory.py 15 inventory.add arithmetic killed `+` -&gt; `-` in `self.stock.get(sku, 0) + count` assert the exact numeric result, not just its type.         self.stock[sku] = self.stock.get(sku, 0) + count         self.stock[sku] = self.stock.get(sku, 0) - count tests/test_inventory.py::testinventory::test_add_and_take">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:15</span>
+    <span class="ctx">Inventory.add</span>
+    <span class="op">arithmetic</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- self.stock[sku] = self.stock.get(sku, 0) + count</span><span class="add">+ self.stock[sku] = self.stock.get(sku, 0) - count</span></pre>
+  <p class="desc">`+` -&gt; `-` in `self.stock.get(sku, 0) + count`</p>
+  <p class="hint">Assert the exact numeric result, not just its type.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_inventory.py::TestInventory::test_add_and_take</b></span> <span>0.50s</span>  <button class="copy" data-copy="Assert the exact numeric result, not just its type.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/inventory.py 19 inventory.take conditional killed negate condition `count &gt; available` test the branch this condition guards, not only the happy path.         if count &gt; available:         if not (count &gt; available): tests/test_inventory.py::testinventory::test_add_and_take">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:19</span>
+    <span class="ctx">Inventory.take</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if count &gt; available:</span><span class="add">+ if not (count &gt; available):</span></pre>
+  <p class="desc">negate condition `count &gt; available`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_inventory.py::TestInventory::test_add_and_take</b></span> <span>0.50s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/inventory.py 20 inventory.take constant killed string &#x27;not enough stock for %s&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.             raise valueerror(&quot;not enough stock for %s&quot; % sku)             raise valueerror(&quot;&quot; % sku) tests/test_inventory.py::testinventory::test_cannot_take_more_than_available">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:20</span>
+    <span class="ctx">Inventory.take</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- raise ValueError(&quot;not enough stock for %s&quot; % sku)</span><span class="add">+ raise ValueError(&quot;&quot; % sku)</span></pre>
+  <p class="desc">string &#x27;not enough stock for %s&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_inventory.py::TestInventory::test_cannot_take_more_than_available</b></span> <span>0.50s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/inventory.py 21 inventory.take arithmetic killed `-` -&gt; `+` in `available - count` assert the exact numeric result, not just its type.         self.stock[sku] = available - count         self.stock[sku] = available + count tests/test_inventory.py::testinventory::test_add_and_take">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:21</span>
+    <span class="ctx">Inventory.take</span>
+    <span class="op">arithmetic</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- self.stock[sku] = available - count</span><span class="add">+ self.stock[sku] = available + count</span></pre>
+  <p class="desc">`-` -&gt; `+` in `available - count`</p>
+  <p class="hint">Assert the exact numeric result, not just its type.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_inventory.py::TestInventory::test_add_and_take</b></span> <span>0.53s</span>  <button class="copy" data-copy="Assert the exact numeric result, not just its type.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/inventory.py 25 inventory.available return killed `return self.stock.get(sku, 0)` -&gt; `return none` assert the return value; calling the function is not enough.         return self.stock.get(sku, 0)         return none tests/test_inventory.py::testinventory::test_add_and_take">
+  <div class="m-head">
+    <span class="loc">shop/inventory.py:25</span>
+    <span class="ctx">Inventory.available</span>
+    <span class="op">return</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return self.stock.get(sku, 0)</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return self.stock.get(sku, 0)` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_inventory.py::TestInventory::test_add_and_take</b></span> <span>0.53s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 7  constant killed `4.99` -&gt; `5.99` assert against a different value so this constant is observable. standard_fee = 4.99 standard_fee = 5.99 tests/test_cart.py::testcart::test_empty_cart">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:7</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- STANDARD_FEE = 4.99</span><span class="add">+ STANDARD_FEE = 5.99</span></pre>
+  <p class="desc">`4.99` -&gt; `5.99`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_empty_cart</b></span> <span>0.51s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 10  constant killed `0.0` -&gt; `1.0` assert against a different value so this constant is observable.     &quot;basic&quot;: 0.0,     &quot;basic&quot;: 1.0, tests/test_cart.py::testcart::test_total_adds_shipping">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:10</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;basic&quot;: 0.0,</span><span class="add">+ &quot;basic&quot;: 1.0,</span></pre>
+  <p class="desc">`0.0` -&gt; `1.0`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_total_adds_shipping</b></span> <span>0.51s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 11  constant killed string &#x27;silver&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     &quot;silver&quot;: 0.05,     &quot;&quot;: 0.05, tests/test_pricing.py::testpricing::test_silver_gets_base_discount">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:11</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;silver&quot;: 0.05,</span><span class="add">+ &quot;&quot;: 0.05,</span></pre>
+  <p class="desc">string &#x27;silver&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_pricing.py::TestPricing::test_silver_gets_base_discount</b></span> <span>0.55s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 11  constant killed `0.05` -&gt; `1.05` assert against a different value so this constant is observable.     &quot;silver&quot;: 0.05,     &quot;silver&quot;: 1.05, tests/test_pricing.py::testpricing::test_silver_gets_base_discount">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:11</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;silver&quot;: 0.05,</span><span class="add">+ &quot;silver&quot;: 1.05,</span></pre>
+  <p class="desc">`0.05` -&gt; `1.05`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_pricing.py::TestPricing::test_silver_gets_base_discount</b></span> <span>0.53s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 18 discount_rate return killed `return tier_rates.get(tier, 0.0)` -&gt; `return none` assert the return value; calling the function is not enough.     return tier_rates.get(tier, 0.0)     return none tests/test_cart.py::testcart::test_empty_cart">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:18</span>
+    <span class="ctx">discount_rate</span>
+    <span class="op">return</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return TIER_RATES.get(tier, 0.0)</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return TIER_RATES.get(tier, 0.0)` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_empty_cart</b></span> <span>0.48s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 23 discount_for conditional killed negate condition `total &gt;= free_shipping_threshold and tier == &quot;gold&quot;` test the branch this condition guards, not only the happy path.     if total &gt;= free_shipping_threshold and tier == &quot;gold&quot;:     if not (total &gt;= free_shipping_threshold and tier == &quot;gold&quot;): tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:23</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if total &gt;= FREE_SHIPPING_THRESHOLD and tier == &quot;gold&quot;:</span><span class="add">+ if not (total &gt;= FREE_SHIPPING_THRESHOLD and tier == &quot;gold&quot;):</span></pre>
+  <p class="desc">negate condition `total &gt;= FREE_SHIPPING_THRESHOLD and tier == &quot;gold&quot;`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.44s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 23 discount_for boolean killed `and` -&gt; `or` in `total &gt;= free_shipping_threshold and tier == &quot;gold&quot;` cover a case where only one operand is true.     if total &gt;= free_shipping_threshold and tier == &quot;gold&quot;:     if total &gt;= free_shipping_threshold or tier == &quot;gold&quot;: tests/test_pricing.py::testpricing::test_silver_gets_base_discount">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:23</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">boolean</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if total &gt;= FREE_SHIPPING_THRESHOLD and tier == &quot;gold&quot;:</span><span class="add">+ if total &gt;= FREE_SHIPPING_THRESHOLD or tier == &quot;gold&quot;:</span></pre>
+  <p class="desc">`and` -&gt; `or` in `total &gt;= FREE_SHIPPING_THRESHOLD and tier == &quot;gold&quot;`</p>
+  <p class="hint">Cover a case where only one operand is true.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_pricing.py::TestPricing::test_silver_gets_base_discount</b></span> <span>0.42s</span>  <button class="copy" data-copy="Cover a case where only one operand is true.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 23 discount_for comparison killed `==` -&gt; `!=` in `tier == &quot;gold&quot;` add a test at the boundary where this comparison flips.     if total &gt;= free_shipping_threshold and tier == &quot;gold&quot;:     if total &gt;= free_shipping_threshold and tier != &quot;gold&quot;: tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:23</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">comparison</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if total &gt;= FREE_SHIPPING_THRESHOLD and tier == &quot;gold&quot;:</span><span class="add">+ if total &gt;= FREE_SHIPPING_THRESHOLD and tier != &quot;gold&quot;:</span></pre>
+  <p class="desc">`==` -&gt; `!=` in `tier == &quot;gold&quot;`</p>
+  <p class="hint">Add a test at the boundary where this comparison flips.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.41s</span>  <button class="copy" data-copy="Add a test at the boundary where this comparison flips.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 23 discount_for constant killed string &#x27;gold&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     if total &gt;= free_shipping_threshold and tier == &quot;gold&quot;:     if total &gt;= free_shipping_threshold and tier == &quot;&quot;: tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:23</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if total &gt;= FREE_SHIPPING_THRESHOLD and tier == &quot;gold&quot;:</span><span class="add">+ if total &gt;= FREE_SHIPPING_THRESHOLD and tier == &quot;&quot;:</span></pre>
+  <p class="desc">string &#x27;gold&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.44s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 24 discount_for return killed `return round(total * 0.15, 2)` -&gt; `return none` assert the return value; calling the function is not enough.         return round(total * 0.15, 2)         return none tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:24</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">return</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(total * 0.15, 2)</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return round(total * 0.15, 2)` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.44s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 24 discount_for arithmetic killed `*` -&gt; `/` in `total * 0.15` assert the exact numeric result, not just its type.         return round(total * 0.15, 2)         return round(total / 0.15, 2) tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:24</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">arithmetic</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(total * 0.15, 2)</span><span class="add">+ return round(total / 0.15, 2)</span></pre>
+  <p class="desc">`*` -&gt; `/` in `total * 0.15`</p>
+  <p class="hint">Assert the exact numeric result, not just its type.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.42s</span>  <button class="copy" data-copy="Assert the exact numeric result, not just its type.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 24 discount_for constant killed `0.15` -&gt; `1.15` assert against a different value so this constant is observable.         return round(total * 0.15, 2)         return round(total * 1.15, 2) tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:24</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(total * 0.15, 2)</span><span class="add">+ return round(total * 1.15, 2)</span></pre>
+  <p class="desc">`0.15` -&gt; `1.15`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.41s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 25 discount_for return killed `return round(total * discount_rate(tier), 2)` -&gt; `return none` assert the return value; calling the function is not enough.     return round(total * discount_rate(tier), 2)     return none tests/test_cart.py::testcart::test_empty_cart">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:25</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">return</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(total * discount_rate(tier), 2)</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return round(total * discount_rate(tier), 2)` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_empty_cart</b></span> <span>0.41s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 25 discount_for arithmetic killed `*` -&gt; `/` in `total * discount_rate(tier)` assert the exact numeric result, not just its type.     return round(total * discount_rate(tier), 2)     return round(total / discount_rate(tier), 2) tests/test_cart.py::testcart::test_empty_cart">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:25</span>
+    <span class="ctx">discount_for</span>
+    <span class="op">arithmetic</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return round(total * discount_rate(tier), 2)</span><span class="add">+ return round(total / discount_rate(tier), 2)</span></pre>
+  <p class="desc">`*` -&gt; `/` in `total * discount_rate(tier)`</p>
+  <p class="hint">Assert the exact numeric result, not just its type.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_empty_cart</b></span> <span>0.39s</span>  <button class="copy" data-copy="Assert the exact numeric result, not just its type.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 30 shipping_fee conditional killed negate condition `express` test the branch this condition guards, not only the happy path.     if express:     if not (express): tests/test_cart.py::testcart::test_empty_cart">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:30</span>
+    <span class="ctx">shipping_fee</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if express:</span><span class="add">+ if not (express):</span></pre>
+  <p class="desc">negate condition `express`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_empty_cart</b></span> <span>0.41s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 32 shipping_fee conditional killed negate condition `total &gt;= free_shipping_threshold` test the branch this condition guards, not only the happy path.     if total &gt;= free_shipping_threshold:     if not (total &gt;= free_shipping_threshold): tests/test_cart.py::testcart::test_empty_cart">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:32</span>
+    <span class="ctx">shipping_fee</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if total &gt;= FREE_SHIPPING_THRESHOLD:</span><span class="add">+ if not (total &gt;= FREE_SHIPPING_THRESHOLD):</span></pre>
+  <p class="desc">negate condition `total &gt;= FREE_SHIPPING_THRESHOLD`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_empty_cart</b></span> <span>0.44s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 33 shipping_fee return killed `return 0.0` -&gt; `return none` assert the return value; calling the function is not enough.         return 0.0         return none tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:33</span>
+    <span class="ctx">shipping_fee</span>
+    <span class="op">return</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return 0.0</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return 0.0` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.41s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 33 shipping_fee constant killed `0.0` -&gt; `1.0` assert against a different value so this constant is observable.         return 0.0         return 1.0 tests/test_cart.py::testcart::test_gold_cart_applies_discount">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:33</span>
+    <span class="ctx">shipping_fee</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return 0.0</span><span class="add">+ return 1.0</span></pre>
+  <p class="desc">`0.0` -&gt; `1.0`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_gold_cart_applies_discount</b></span> <span>0.41s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="shop/pricing.py 34 shipping_fee return killed `return standard_fee` -&gt; `return none` assert the return value; calling the function is not enough.     return standard_fee     return none tests/test_cart.py::testcart::test_empty_cart">
+  <div class="m-head">
+    <span class="loc">shop/pricing.py:34</span>
+    <span class="ctx">shipping_fee</span>
+    <span class="op">return</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return STANDARD_FEE</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return STANDARD_FEE` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"><span>killed by <b>tests/test_cart.py::TestCart::test_empty_cart</b></span> <span>0.41s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article></section>
+
+  <section class="panel">
+    <h2>Files</h2>
+    <table><thead><tr><th>file</th><th class="num">killed</th><th class="num">survived</th><th class="num">score</th><th></th></tr></thead>
+    <tbody><tr><td>shop/cart.py</td><td class="num">13</td><td class="num">5</td><td class="num">72%</td><td><div class="fbar"><i style="width:72.2%"></i></div></td></tr><tr><td>shop/inventory.py</td><td class="num">7</td><td class="num">8</td><td class="num">47%</td><td><div class="fbar"><i style="width:46.7%"></i></div></td></tr><tr><td>shop/pricing.py</td><td class="num">19</td><td class="num">11</td><td class="num">63%</td><td><div class="fbar"><i style="width:63.3%"></i></div></td></tr></tbody></table>
+  </section>
+
+  
+
+  <details class="learn">
+    <summary>How to read this report</summary>
+    <p><strong>Mutation score</strong> is the share of generated mutants your suite detected. A mutant is a small, syntactically valid change to your code: a flipped comparison, a changed constant, a removed return value. If the suite still passes, the mutant <em>survived</em>, which means no test observed that behaviour.</p>
+    <p>Survivors are not automatically bugs. Some mutants are <em>equivalent</em> (the change cannot alter observable behaviour, such as changing the rounding precision of a value that is already exact). Treat survivors as questions, not verdicts. The hint on each card suggests the kind of assertion that would settle it.</p>
+    <p>Fang only mutates the lines in scope, runs the suite with fail-fast, and treats a timeout or a crash caused by the mutant as detection. A green baseline is required; a red suite cannot distinguish a surviving mutant from a pre-existing failure.</p>
+    <p></p>
+  </details>
+
+  <footer class="end">
+    <span>generated by fang 0.1.0 &middot; zero runtime dependencies</span>
+    <span>python -m pytest -x -q --tb=short --disable-warnings -p no:cacheprovider tests</span>
+  </footer>
+</div>
+<script id="fang-data" type="application/json">{"tool": "fang", "version": "0.1.0", "root": "examples/shop", "mode": "all", "diff_base": null, "started_at": "2026-10-29T04:28:21+00:00", "duration": 7.844, "baseline_duration": 0.328, "test_label": "pytest", "test_command": "python -m pytest -x -q --tb=short --disable-warnings -p no:cacheprovider tests", "files_scanned": 4, "mutants_total": 63, "mutants_considered": 63, "sampled": false, "sample_size": null, "python_version": "3.9.13", "git_head": "b3a7102", "cache_hits": 0, "tests_collected": 10, "timeout": 5.0, "score": 61.9, "score_ci": null, "killed": 39, "survived": 24, "timeout_count": 0, "error_count": 0, "worker_error_count": 0, "notes": [], "operators": {"conditional": {"killed": 6, "survived": 0}, "comparison": {"killed": 1, "survived": 5}, "constant": {"killed": 14, "survived": 17}, "statement": {"killed": 1, "survived": 0}, "return": {"killed": 9, "survived": 2}, "arithmetic": {"killed": 7, "survived": 0}, "boolean": {"killed": 1, "survived": 0}}, "results": [{"id": "de52a2191e4a", "path": "shop/cart.py", "line": 17, "col": 12, "end_line": 17, "end_col": 25, "operator": "conditional", "context": "Cart.add", "original": "quantity <= 0", "replacement": "not (quantity <= 0)", "expression_before": "quantity <= 0", "expression_after": "not (quantity <= 0)", "source_line": "        if quantity <= 0:", "mutated_line": "        if not (quantity <= 0):", "description": "negate condition `quantity <= 0`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.39, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "00d31f10fada", "path": "shop/cart.py", "line": 17, "col": 21, "end_line": 17, "end_col": 23, "operator": "comparison", "context": "Cart.add", "original": "<=", "replacement": "<", "expression_before": "quantity <= 0", "expression_after": "quantity < 0", "source_line": "        if quantity <= 0:", "mutated_line": "        if quantity < 0:", "description": "`<=` -> `<` in `quantity <= 0`", "hint": "Add a test at the boundary where this comparison flips.", "status": "survived", "duration": 0.359, "killer": null, "cached": false}, {"id": "627f890735d8", "path": "shop/cart.py", "line": 17, "col": 24, "end_line": 17, "end_col": 25, "operator": "constant", "context": "Cart.add", "original": "0", "replacement": "1", "expression_before": "0", "expression_after": "1", "source_line": "        if quantity <= 0:", "mutated_line": "        if quantity <= 1:", "description": "`0` -> `1`", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.375, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "71e62cfc7fa1", "path": "shop/cart.py", "line": 18, "col": 30, "end_line": 18, "end_col": 57, "operator": "constant", "context": "Cart.add", "original": "\"quantity must be positive\"", "replacement": "\"\"", "expression_before": "\"quantity must be positive\"", "expression_after": "\"\"", "source_line": "            raise ValueError(\"quantity must be positive\")", "mutated_line": "            raise ValueError(\"\")", "description": "string 'quantity must be positive' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.36, "killer": null, "cached": false}, {"id": "63c649375023", "path": "shop/cart.py", "line": 19, "col": 9, "end_line": 19, "end_col": 78, "operator": "statement", "context": "Cart.add", "original": "self.items.append({\"sku\": sku, \"price\": price, \"quantity\": quantity})", "replacement": "pass", "expression_before": "self.items.append({\"sku\": sku, \"price\": price, \"quantity\": quantity})", "expression_after": "pass", "source_line": "        self.items.append({\"sku\": sku, \"price\": price, \"quantity\": quantity})", "mutated_line": "        pass", "description": "remove `self.items.append({\"sku\": sku, \"price\": price, \"quantity\": qu...`", "hint": "Assert the side effect of this call (state, output, or log).", "status": "killed", "duration": 0.422, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "8f53e2829d14", "path": "shop/cart.py", "line": 19, "col": 28, "end_line": 19, "end_col": 33, "operator": "constant", "context": "Cart.add", "original": "\"sku\"", "replacement": "\"\"", "expression_before": "\"sku\"", "expression_after": "\"\"", "source_line": "        self.items.append({\"sku\": sku, \"price\": price, \"quantity\": quantity})", "mutated_line": "        self.items.append({\"\": sku, \"price\": price, \"quantity\": quantity})", "description": "string 'sku' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.375, "killer": null, "cached": false}, {"id": "61c32ca691a5", "path": "shop/cart.py", "line": 19, "col": 40, "end_line": 19, "end_col": 47, "operator": "constant", "context": "Cart.add", "original": "\"price\"", "replacement": "\"\"", "expression_before": "\"price\"", "expression_after": "\"\"", "source_line": "        self.items.append({\"sku\": sku, \"price\": price, \"quantity\": quantity})", "mutated_line": "        self.items.append({\"sku\": sku, \"\": price, \"quantity\": quantity})", "description": "string 'price' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.422, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "acbf05c0dea5", "path": "shop/cart.py", "line": 19, "col": 56, "end_line": 19, "end_col": 66, "operator": "constant", "context": "Cart.add", "original": "\"quantity\"", "replacement": "\"\"", "expression_before": "\"quantity\"", "expression_after": "\"\"", "source_line": "        self.items.append({\"sku\": sku, \"price\": price, \"quantity\": quantity})", "mutated_line": "        self.items.append({\"sku\": sku, \"price\": price, \"\": quantity})", "description": "string 'quantity' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.406, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "faef300f7135", "path": "shop/cart.py", "line": 22, "col": 9, "end_line": 24, "end_col": 10, "operator": "return", "context": "Cart.subtotal", "original": "return round(\n            sum(float(item[\"price\"]) * int(item[\"quantity\"]) for item in self.items), 2\n        )", "replacement": "return None", "expression_before": "return round(\n            sum(float(item[\"price\"]) * int(item[\"quantity\"]) for item in self.items), 2\n        )", "expression_after": "return None", "source_line": "        return round(", "mutated_line": null, "description": "`return round( sum(float(item[\"price\"]) * int(item[\"quantity\"]...` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "killed", "duration": 0.5, "killer": "tests/test_cart.py::TestCart::test_empty_cart", "cached": false}, {"id": "cfe549f58788", "path": "shop/cart.py", "line": 23, "col": 28, "end_line": 23, "end_col": 35, "operator": "constant", "context": "Cart.subtotal", "original": "\"price\"", "replacement": "\"\"", "expression_before": "\"price\"", "expression_after": "\"\"", "source_line": "            sum(float(item[\"price\"]) * int(item[\"quantity\"]) for item in self.items), 2", "mutated_line": "            sum(float(item[\"\"]) * int(item[\"quantity\"]) for item in self.items), 2", "description": "string 'price' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.484, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "5a842e8ad514", "path": "shop/cart.py", "line": 23, "col": 38, "end_line": 23, "end_col": 39, "operator": "arithmetic", "context": "Cart.subtotal", "original": "*", "replacement": "/", "expression_before": "float(item[\"price\"]) * int(item[\"quantity\"])", "expression_after": "float(item[\"price\"]) / int(item[\"quantity\"])", "source_line": "            sum(float(item[\"price\"]) * int(item[\"quantity\"]) for item in self.items), 2", "mutated_line": "            sum(float(item[\"price\"]) / int(item[\"quantity\"]) for item in self.items), 2", "description": "`*` -> `/` in `float(item[\"price\"]) * int(item[\"quantity\"])`", "hint": "Assert the exact numeric result, not just its type.", "status": "killed", "duration": 0.5, "killer": "tests/test_cart.py::TestCart::test_total_adds_shipping", "cached": false}, {"id": "34442b98040b", "path": "shop/cart.py", "line": 23, "col": 49, "end_line": 23, "end_col": 59, "operator": "constant", "context": "Cart.subtotal", "original": "\"quantity\"", "replacement": "\"\"", "expression_before": "\"quantity\"", "expression_after": "\"\"", "source_line": "            sum(float(item[\"price\"]) * int(item[\"quantity\"]) for item in self.items), 2", "mutated_line": "            sum(float(item[\"price\"]) * int(item[\"\"]) for item in self.items), 2", "description": "string 'quantity' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.5, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "c04416401ed8", "path": "shop/cart.py", "line": 23, "col": 87, "end_line": 23, "end_col": 88, "operator": "constant", "context": "Cart.subtotal", "original": "2", "replacement": "3", "expression_before": "2", "expression_after": "3", "source_line": "            sum(float(item[\"price\"]) * int(item[\"quantity\"]) for item in self.items), 2", "mutated_line": "            sum(float(item[\"price\"]) * int(item[\"quantity\"]) for item in self.items), 3", "description": "`2` -> `3`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.453, "killer": null, "cached": false}, {"id": "b0dbce5c2a75", "path": "shop/cart.py", "line": 30, "col": 9, "end_line": 30, "end_col": 56, "operator": "return", "context": "Cart.total", "original": "return round(subtotal - discount + shipping, 2)", "replacement": "return None", "expression_before": "return round(subtotal - discount + shipping, 2)", "expression_after": "return None", "source_line": "        return round(subtotal - discount + shipping, 2)", "mutated_line": "        return None", "description": "`return round(subtotal - discount + shipping, 2)` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "killed", "duration": 0.5, "killer": "tests/test_cart.py::TestCart::test_empty_cart", "cached": false}, {"id": "e41a6ac2a06f", "path": "shop/cart.py", "line": 30, "col": 31, "end_line": 30, "end_col": 32, "operator": "arithmetic", "context": "Cart.total", "original": "-", "replacement": "+", "expression_before": "subtotal - discount", "expression_after": "subtotal + discount", "source_line": "        return round(subtotal - discount + shipping, 2)", "mutated_line": "        return round(subtotal + discount + shipping, 2)", "description": "`-` -> `+` in `subtotal - discount`", "hint": "Assert the exact numeric result, not just its type.", "status": "killed", "duration": 0.516, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "585ee7e1aa9b", "path": "shop/cart.py", "line": 30, "col": 42, "end_line": 30, "end_col": 43, "operator": "arithmetic", "context": "Cart.total", "original": "+", "replacement": "-", "expression_before": "subtotal - discount + shipping", "expression_after": "subtotal - discount - shipping", "source_line": "        return round(subtotal - discount + shipping, 2)", "mutated_line": "        return round(subtotal - discount - shipping, 2)", "description": "`+` -> `-` in `subtotal - discount + shipping`", "hint": "Assert the exact numeric result, not just its type.", "status": "killed", "duration": 0.515, "killer": "tests/test_cart.py::TestCart::test_empty_cart", "cached": false}, {"id": "1f8bcb70cac9", "path": "shop/cart.py", "line": 30, "col": 54, "end_line": 30, "end_col": 55, "operator": "constant", "context": "Cart.total", "original": "2", "replacement": "3", "expression_before": "2", "expression_after": "3", "source_line": "        return round(subtotal - discount + shipping, 2)", "mutated_line": "        return round(subtotal - discount + shipping, 3)", "description": "`2` -> `3`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.454, "killer": null, "cached": false}, {"id": "85487aa7cae1", "path": "shop/cart.py", "line": 33, "col": 9, "end_line": 33, "end_col": 31, "operator": "return", "context": "Cart.__len__", "original": "return len(self.items)", "replacement": "return None", "expression_before": "return len(self.items)", "expression_after": "return None", "source_line": "        return len(self.items)", "mutated_line": "        return None", "description": "`return len(self.items)` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "killed", "duration": 0.5, "killer": "tests/test_cart.py::TestCart::test_len", "cached": false}, {"id": "f055f6b3b5b4", "path": "shop/inventory.py", "line": 13, "col": 12, "end_line": 13, "end_col": 21, "operator": "conditional", "context": "Inventory.add", "original": "count < 0", "replacement": "not (count < 0)", "expression_before": "count < 0", "expression_after": "not (count < 0)", "source_line": "        if count < 0:", "mutated_line": "        if not (count < 0):", "description": "negate condition `count < 0`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.5, "killer": "tests/test_inventory.py::TestInventory::test_add_and_take", "cached": false}, {"id": "6de6c8aefbeb", "path": "shop/inventory.py", "line": 13, "col": 18, "end_line": 13, "end_col": 19, "operator": "comparison", "context": "Inventory.add", "original": "<", "replacement": "<=", "expression_before": "count < 0", "expression_after": "count <= 0", "source_line": "        if count < 0:", "mutated_line": "        if count <= 0:", "description": "`<` -> `<=` in `count < 0`", "hint": "Add a test at the boundary where this comparison flips.", "status": "survived", "duration": 0.469, "killer": null, "cached": false}, {"id": "a60cf8f7510a", "path": "shop/inventory.py", "line": 13, "col": 20, "end_line": 13, "end_col": 21, "operator": "constant", "context": "Inventory.add", "original": "0", "replacement": "1", "expression_before": "0", "expression_after": "1", "source_line": "        if count < 0:", "mutated_line": "        if count < 1:", "description": "`0` -> `1`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.484, "killer": null, "cached": false}, {"id": "11c5a9083c03", "path": "shop/inventory.py", "line": 14, "col": 30, "end_line": 14, "end_col": 59, "operator": "constant", "context": "Inventory.add", "original": "\"cannot add a negative count\"", "replacement": "\"\"", "expression_before": "\"cannot add a negative count\"", "expression_after": "\"\"", "source_line": "            raise ValueError(\"cannot add a negative count\")", "mutated_line": "            raise ValueError(\"\")", "description": "string 'cannot add a negative count' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.453, "killer": null, "cached": false}, {"id": "50b3b0b6382a", "path": "shop/inventory.py", "line": 15, "col": 47, "end_line": 15, "end_col": 48, "operator": "constant", "context": "Inventory.add", "original": "0", "replacement": "1", "expression_before": "0", "expression_after": "1", "source_line": "        self.stock[sku] = self.stock.get(sku, 0) + count", "mutated_line": "        self.stock[sku] = self.stock.get(sku, 1) + count", "description": "`0` -> `1`", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.5, "killer": "tests/test_inventory.py::TestInventory::test_add_and_take", "cached": false}, {"id": "e8d5685945ef", "path": "shop/inventory.py", "line": 15, "col": 50, "end_line": 15, "end_col": 51, "operator": "arithmetic", "context": "Inventory.add", "original": "+", "replacement": "-", "expression_before": "self.stock.get(sku, 0) + count", "expression_after": "self.stock.get(sku, 0) - count", "source_line": "        self.stock[sku] = self.stock.get(sku, 0) + count", "mutated_line": "        self.stock[sku] = self.stock.get(sku, 0) - count", "description": "`+` -> `-` in `self.stock.get(sku, 0) + count`", "hint": "Assert the exact numeric result, not just its type.", "status": "killed", "duration": 0.5, "killer": "tests/test_inventory.py::TestInventory::test_add_and_take", "cached": false}, {"id": "81f0809077f4", "path": "shop/inventory.py", "line": 18, "col": 41, "end_line": 18, "end_col": 42, "operator": "constant", "context": "Inventory.take", "original": "0", "replacement": "1", "expression_before": "0", "expression_after": "1", "source_line": "        available = self.stock.get(sku, 0)", "mutated_line": "        available = self.stock.get(sku, 1)", "description": "`0` -> `1`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.484, "killer": null, "cached": false}, {"id": "32c53f81e7c3", "path": "shop/inventory.py", "line": 19, "col": 12, "end_line": 19, "end_col": 29, "operator": "conditional", "context": "Inventory.take", "original": "count > available", "replacement": "not (count > available)", "expression_before": "count > available", "expression_after": "not (count > available)", "source_line": "        if count > available:", "mutated_line": "        if not (count > available):", "description": "negate condition `count > available`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.5, "killer": "tests/test_inventory.py::TestInventory::test_add_and_take", "cached": false}, {"id": "038238bdbea9", "path": "shop/inventory.py", "line": 19, "col": 18, "end_line": 19, "end_col": 19, "operator": "comparison", "context": "Inventory.take", "original": ">", "replacement": ">=", "expression_before": "count > available", "expression_after": "count >= available", "source_line": "        if count > available:", "mutated_line": "        if count >= available:", "description": "`>` -> `>=` in `count > available`", "hint": "Add a test at the boundary where this comparison flips.", "status": "survived", "duration": 0.469, "killer": null, "cached": false}, {"id": "1168fd8c5b71", "path": "shop/inventory.py", "line": 20, "col": 30, "end_line": 20, "end_col": 55, "operator": "constant", "context": "Inventory.take", "original": "\"not enough stock for %s\"", "replacement": "\"\"", "expression_before": "\"not enough stock for %s\"", "expression_after": "\"\"", "source_line": "            raise ValueError(\"not enough stock for %s\" % sku)", "mutated_line": "            raise ValueError(\"\" % sku)", "description": "string 'not enough stock for %s' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.5, "killer": "tests/test_inventory.py::TestInventory::test_cannot_take_more_than_available", "cached": false}, {"id": "5f1af63dc221", "path": "shop/inventory.py", "line": 21, "col": 37, "end_line": 21, "end_col": 38, "operator": "arithmetic", "context": "Inventory.take", "original": "-", "replacement": "+", "expression_before": "available - count", "expression_after": "available + count", "source_line": "        self.stock[sku] = available - count", "mutated_line": "        self.stock[sku] = available + count", "description": "`-` -> `+` in `available - count`", "hint": "Assert the exact numeric result, not just its type.", "status": "killed", "duration": 0.532, "killer": "tests/test_inventory.py::TestInventory::test_add_and_take", "cached": false}, {"id": "54f68a2a8f84", "path": "shop/inventory.py", "line": 22, "col": 9, "end_line": 22, "end_col": 20, "operator": "return", "context": "Inventory.take", "original": "return True", "replacement": "return None", "expression_before": "return True", "expression_after": "return None", "source_line": "        return True", "mutated_line": "        return None", "description": "`return True` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "survived", "duration": 0.468, "killer": null, "cached": false}, {"id": "eb65677974a9", "path": "shop/inventory.py", "line": 22, "col": 16, "end_line": 22, "end_col": 20, "operator": "constant", "context": "Inventory.take", "original": "True", "replacement": "False", "expression_before": "True", "expression_after": "False", "source_line": "        return True", "mutated_line": "        return False", "description": "`True` -> `False`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.484, "killer": null, "cached": false}, {"id": "08ec9eb2c7f9", "path": "shop/inventory.py", "line": 25, "col": 9, "end_line": 25, "end_col": 38, "operator": "return", "context": "Inventory.available", "original": "return self.stock.get(sku, 0)", "replacement": "return None", "expression_before": "return self.stock.get(sku, 0)", "expression_after": "return None", "source_line": "        return self.stock.get(sku, 0)", "mutated_line": "        return None", "description": "`return self.stock.get(sku, 0)` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "killed", "duration": 0.532, "killer": "tests/test_inventory.py::TestInventory::test_add_and_take", "cached": false}, {"id": "800d2dec83fa", "path": "shop/inventory.py", "line": 25, "col": 36, "end_line": 25, "end_col": 37, "operator": "constant", "context": "Inventory.available", "original": "0", "replacement": "1", "expression_before": "0", "expression_after": "1", "source_line": "        return self.stock.get(sku, 0)", "mutated_line": "        return self.stock.get(sku, 1)", "description": "`0` -> `1`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.469, "killer": null, "cached": false}, {"id": "b16d3ca169c7", "path": "shop/pricing.py", "line": 5, "col": 27, "end_line": 5, "end_col": 32, "operator": "constant", "context": "", "original": "100.0", "replacement": "101.0", "expression_before": "100.0", "expression_after": "101.0", "source_line": "FREE_SHIPPING_THRESHOLD = 100.0", "mutated_line": "FREE_SHIPPING_THRESHOLD = 101.0", "description": "`100.0` -> `101.0`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.485, "killer": null, "cached": false}, {"id": "93f7c5b0bb7b", "path": "shop/pricing.py", "line": 6, "col": 15, "end_line": 6, "end_col": 19, "operator": "constant", "context": "", "original": "9.99", "replacement": "10.99", "expression_before": "9.99", "expression_after": "10.99", "source_line": "EXPRESS_FEE = 9.99", "mutated_line": "EXPRESS_FEE = 10.99", "description": "`9.99` -> `10.99`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.5, "killer": null, "cached": false}, {"id": "10a9195b35a4", "path": "shop/pricing.py", "line": 7, "col": 16, "end_line": 7, "end_col": 20, "operator": "constant", "context": "", "original": "4.99", "replacement": "5.99", "expression_before": "4.99", "expression_after": "5.99", "source_line": "STANDARD_FEE = 4.99", "mutated_line": "STANDARD_FEE = 5.99", "description": "`4.99` -> `5.99`", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.515, "killer": "tests/test_cart.py::TestCart::test_empty_cart", "cached": false}, {"id": "33a258e4ccc7", "path": "shop/pricing.py", "line": 10, "col": 5, "end_line": 10, "end_col": 12, "operator": "constant", "context": "", "original": "\"basic\"", "replacement": "\"\"", "expression_before": "\"basic\"", "expression_after": "\"\"", "source_line": "    \"basic\": 0.0,", "mutated_line": "    \"\": 0.0,", "description": "string 'basic' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.484, "killer": null, "cached": false}, {"id": "4cb0f3bb149e", "path": "shop/pricing.py", "line": 10, "col": 14, "end_line": 10, "end_col": 17, "operator": "constant", "context": "", "original": "0.0", "replacement": "1.0", "expression_before": "0.0", "expression_after": "1.0", "source_line": "    \"basic\": 0.0,", "mutated_line": "    \"basic\": 1.0,", "description": "`0.0` -> `1.0`", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.515, "killer": "tests/test_cart.py::TestCart::test_total_adds_shipping", "cached": false}, {"id": "f264fbbb5e68", "path": "shop/pricing.py", "line": 11, "col": 5, "end_line": 11, "end_col": 13, "operator": "constant", "context": "", "original": "\"silver\"", "replacement": "\"\"", "expression_before": "\"silver\"", "expression_after": "\"\"", "source_line": "    \"silver\": 0.05,", "mutated_line": "    \"\": 0.05,", "description": "string 'silver' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.547, "killer": "tests/test_pricing.py::TestPricing::test_silver_gets_base_discount", "cached": false}, {"id": "c55f5c196df6", "path": "shop/pricing.py", "line": 11, "col": 15, "end_line": 11, "end_col": 19, "operator": "constant", "context": "", "original": "0.05", "replacement": "1.05", "expression_before": "0.05", "expression_after": "1.05", "source_line": "    \"silver\": 0.05,", "mutated_line": "    \"silver\": 1.05,", "description": "`0.05` -> `1.05`", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.532, "killer": "tests/test_pricing.py::TestPricing::test_silver_gets_base_discount", "cached": false}, {"id": "b87cfbe8fc17", "path": "shop/pricing.py", "line": 12, "col": 5, "end_line": 12, "end_col": 11, "operator": "constant", "context": "", "original": "\"gold\"", "replacement": "\"\"", "expression_before": "\"gold\"", "expression_after": "\"\"", "source_line": "    \"gold\": 0.10,", "mutated_line": "    \"\": 0.10,", "description": "string 'gold' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.453, "killer": null, "cached": false}, {"id": "96b3ae4c0581", "path": "shop/pricing.py", "line": 12, "col": 13, "end_line": 12, "end_col": 17, "operator": "constant", "context": "", "original": "0.10", "replacement": "1.1", "expression_before": "0.10", "expression_after": "1.1", "source_line": "    \"gold\": 0.10,", "mutated_line": "    \"gold\": 1.1,", "description": "`0.1` -> `1.1`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.453, "killer": null, "cached": false}, {"id": "cfd195cd49be", "path": "shop/pricing.py", "line": 18, "col": 5, "end_line": 18, "end_col": 37, "operator": "return", "context": "discount_rate", "original": "return TIER_RATES.get(tier, 0.0)", "replacement": "return None", "expression_before": "return TIER_RATES.get(tier, 0.0)", "expression_after": "return None", "source_line": "    return TIER_RATES.get(tier, 0.0)", "mutated_line": "    return None", "description": "`return TIER_RATES.get(tier, 0.0)` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "killed", "duration": 0.484, "killer": "tests/test_cart.py::TestCart::test_empty_cart", "cached": false}, {"id": "fb1a92a97ec9", "path": "shop/pricing.py", "line": 18, "col": 33, "end_line": 18, "end_col": 36, "operator": "constant", "context": "discount_rate", "original": "0.0", "replacement": "1.0", "expression_before": "0.0", "expression_after": "1.0", "source_line": "    return TIER_RATES.get(tier, 0.0)", "mutated_line": "    return TIER_RATES.get(tier, 1.0)", "description": "`0.0` -> `1.0`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.437, "killer": null, "cached": false}, {"id": "64028b2988ce", "path": "shop/pricing.py", "line": 23, "col": 8, "end_line": 23, "end_col": 59, "operator": "conditional", "context": "discount_for", "original": "total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\"", "replacement": "not (total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\")", "expression_before": "total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\"", "expression_after": "not (total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\")", "source_line": "    if total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\":", "mutated_line": "    if not (total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\"):", "description": "negate condition `total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\"`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.438, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "2e4645d7c674", "path": "shop/pricing.py", "line": 23, "col": 14, "end_line": 23, "end_col": 16, "operator": "comparison", "context": "discount_for", "original": ">=", "replacement": ">", "expression_before": "total >= FREE_SHIPPING_THRESHOLD", "expression_after": "total > FREE_SHIPPING_THRESHOLD", "source_line": "    if total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\":", "mutated_line": "    if total > FREE_SHIPPING_THRESHOLD and tier == \"gold\":", "description": "`>=` -> `>` in `total >= FREE_SHIPPING_THRESHOLD`", "hint": "Add a test at the boundary where this comparison flips.", "status": "survived", "duration": 0.375, "killer": null, "cached": false}, {"id": "e3f39cce7c1a", "path": "shop/pricing.py", "line": 23, "col": 41, "end_line": 23, "end_col": 44, "operator": "boolean", "context": "discount_for", "original": "and", "replacement": "or", "expression_before": "total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\"", "expression_after": "total >= FREE_SHIPPING_THRESHOLD or tier == \"gold\"", "source_line": "    if total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\":", "mutated_line": "    if total >= FREE_SHIPPING_THRESHOLD or tier == \"gold\":", "description": "`and` -> `or` in `total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\"`", "hint": "Cover a case where only one operand is true.", "status": "killed", "duration": 0.422, "killer": "tests/test_pricing.py::TestPricing::test_silver_gets_base_discount", "cached": false}, {"id": "4c1fdf719124", "path": "shop/pricing.py", "line": 23, "col": 50, "end_line": 23, "end_col": 52, "operator": "comparison", "context": "discount_for", "original": "==", "replacement": "!=", "expression_before": "tier == \"gold\"", "expression_after": "tier != \"gold\"", "source_line": "    if total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\":", "mutated_line": "    if total >= FREE_SHIPPING_THRESHOLD and tier != \"gold\":", "description": "`==` -> `!=` in `tier == \"gold\"`", "hint": "Add a test at the boundary where this comparison flips.", "status": "killed", "duration": 0.406, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "482e719ddc9f", "path": "shop/pricing.py", "line": 23, "col": 53, "end_line": 23, "end_col": 59, "operator": "constant", "context": "discount_for", "original": "\"gold\"", "replacement": "\"\"", "expression_before": "\"gold\"", "expression_after": "\"\"", "source_line": "    if total >= FREE_SHIPPING_THRESHOLD and tier == \"gold\":", "mutated_line": "    if total >= FREE_SHIPPING_THRESHOLD and tier == \"\":", "description": "string 'gold' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.437, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "f84dc9f21a17", "path": "shop/pricing.py", "line": 24, "col": 9, "end_line": 24, "end_col": 38, "operator": "return", "context": "discount_for", "original": "return round(total * 0.15, 2)", "replacement": "return None", "expression_before": "return round(total * 0.15, 2)", "expression_after": "return None", "source_line": "        return round(total * 0.15, 2)", "mutated_line": "        return None", "description": "`return round(total * 0.15, 2)` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "killed", "duration": 0.438, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "ba217d4b9862", "path": "shop/pricing.py", "line": 24, "col": 28, "end_line": 24, "end_col": 29, "operator": "arithmetic", "context": "discount_for", "original": "*", "replacement": "/", "expression_before": "total * 0.15", "expression_after": "total / 0.15", "source_line": "        return round(total * 0.15, 2)", "mutated_line": "        return round(total / 0.15, 2)", "description": "`*` -> `/` in `total * 0.15`", "hint": "Assert the exact numeric result, not just its type.", "status": "killed", "duration": 0.422, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "1a690aff741f", "path": "shop/pricing.py", "line": 24, "col": 30, "end_line": 24, "end_col": 34, "operator": "constant", "context": "discount_for", "original": "0.15", "replacement": "1.15", "expression_before": "0.15", "expression_after": "1.15", "source_line": "        return round(total * 0.15, 2)", "mutated_line": "        return round(total * 1.15, 2)", "description": "`0.15` -> `1.15`", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.406, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "c74b6d51480f", "path": "shop/pricing.py", "line": 24, "col": 36, "end_line": 24, "end_col": 37, "operator": "constant", "context": "discount_for", "original": "2", "replacement": "3", "expression_before": "2", "expression_after": "3", "source_line": "        return round(total * 0.15, 2)", "mutated_line": "        return round(total * 0.15, 3)", "description": "`2` -> `3`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.375, "killer": null, "cached": false}, {"id": "596f25257c84", "path": "shop/pricing.py", "line": 25, "col": 5, "end_line": 25, "end_col": 49, "operator": "return", "context": "discount_for", "original": "return round(total * discount_rate(tier), 2)", "replacement": "return None", "expression_before": "return round(total * discount_rate(tier), 2)", "expression_after": "return None", "source_line": "    return round(total * discount_rate(tier), 2)", "mutated_line": "    return None", "description": "`return round(total * discount_rate(tier), 2)` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "killed", "duration": 0.406, "killer": "tests/test_cart.py::TestCart::test_empty_cart", "cached": false}, {"id": "4a460370948e", "path": "shop/pricing.py", "line": 25, "col": 24, "end_line": 25, "end_col": 25, "operator": "arithmetic", "context": "discount_for", "original": "*", "replacement": "/", "expression_before": "total * discount_rate(tier)", "expression_after": "total / discount_rate(tier)", "source_line": "    return round(total * discount_rate(tier), 2)", "mutated_line": "    return round(total / discount_rate(tier), 2)", "description": "`*` -> `/` in `total * discount_rate(tier)`", "hint": "Assert the exact numeric result, not just its type.", "status": "killed", "duration": 0.391, "killer": "tests/test_cart.py::TestCart::test_empty_cart", "cached": false}, {"id": "9786036c0047", "path": "shop/pricing.py", "line": 25, "col": 47, "end_line": 25, "end_col": 48, "operator": "constant", "context": "discount_for", "original": "2", "replacement": "3", "expression_before": "2", "expression_after": "3", "source_line": "    return round(total * discount_rate(tier), 2)", "mutated_line": "    return round(total * discount_rate(tier), 3)", "description": "`2` -> `3`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.375, "killer": null, "cached": false}, {"id": "f9e0a5189e46", "path": "shop/pricing.py", "line": 30, "col": 8, "end_line": 30, "end_col": 15, "operator": "conditional", "context": "shipping_fee", "original": "express", "replacement": "not (express)", "expression_before": "express", "expression_after": "not (express)", "source_line": "    if express:", "mutated_line": "    if not (express):", "description": "negate condition `express`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.406, "killer": "tests/test_cart.py::TestCart::test_empty_cart", "cached": false}, {"id": "7cd01e33bdb5", "path": "shop/pricing.py", "line": 31, "col": 9, "end_line": 31, "end_col": 27, "operator": "return", "context": "shipping_fee", "original": "return EXPRESS_FEE", "replacement": "return None", "expression_before": "return EXPRESS_FEE", "expression_after": "return None", "source_line": "        return EXPRESS_FEE", "mutated_line": "        return None", "description": "`return EXPRESS_FEE` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "survived", "duration": 0.375, "killer": null, "cached": false}, {"id": "d480ba01f741", "path": "shop/pricing.py", "line": 32, "col": 8, "end_line": 32, "end_col": 40, "operator": "conditional", "context": "shipping_fee", "original": "total >= FREE_SHIPPING_THRESHOLD", "replacement": "not (total >= FREE_SHIPPING_THRESHOLD)", "expression_before": "total >= FREE_SHIPPING_THRESHOLD", "expression_after": "not (total >= FREE_SHIPPING_THRESHOLD)", "source_line": "    if total >= FREE_SHIPPING_THRESHOLD:", "mutated_line": "    if not (total >= FREE_SHIPPING_THRESHOLD):", "description": "negate condition `total >= FREE_SHIPPING_THRESHOLD`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.437, "killer": "tests/test_cart.py::TestCart::test_empty_cart", "cached": false}, {"id": "8e72f1167d98", "path": "shop/pricing.py", "line": 32, "col": 14, "end_line": 32, "end_col": 16, "operator": "comparison", "context": "shipping_fee", "original": ">=", "replacement": ">", "expression_before": "total >= FREE_SHIPPING_THRESHOLD", "expression_after": "total > FREE_SHIPPING_THRESHOLD", "source_line": "    if total >= FREE_SHIPPING_THRESHOLD:", "mutated_line": "    if total > FREE_SHIPPING_THRESHOLD:", "description": "`>=` -> `>` in `total >= FREE_SHIPPING_THRESHOLD`", "hint": "Add a test at the boundary where this comparison flips.", "status": "survived", "duration": 0.359, "killer": null, "cached": false}, {"id": "d2934e6c95cd", "path": "shop/pricing.py", "line": 33, "col": 9, "end_line": 33, "end_col": 19, "operator": "return", "context": "shipping_fee", "original": "return 0.0", "replacement": "return None", "expression_before": "return 0.0", "expression_after": "return None", "source_line": "        return 0.0", "mutated_line": "        return None", "description": "`return 0.0` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "killed", "duration": 0.406, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "555c6c405d72", "path": "shop/pricing.py", "line": 33, "col": 16, "end_line": 33, "end_col": 19, "operator": "constant", "context": "shipping_fee", "original": "0.0", "replacement": "1.0", "expression_before": "0.0", "expression_after": "1.0", "source_line": "        return 0.0", "mutated_line": "        return 1.0", "description": "`0.0` -> `1.0`", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.406, "killer": "tests/test_cart.py::TestCart::test_gold_cart_applies_discount", "cached": false}, {"id": "815556e4e4d3", "path": "shop/pricing.py", "line": 34, "col": 5, "end_line": 34, "end_col": 24, "operator": "return", "context": "shipping_fee", "original": "return STANDARD_FEE", "replacement": "return None", "expression_before": "return STANDARD_FEE", "expression_after": "return None", "source_line": "    return STANDARD_FEE", "mutated_line": "    return None", "description": "`return STANDARD_FEE` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "killed", "duration": 0.406, "killer": "tests/test_cart.py::TestCart::test_empty_cart", "cached": false}]}</script>
+<script>
+(function(){
+  var body=document.body, cards=Array.prototype.slice.call(document.querySelectorAll('.mutant'));
+  var chips=Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
+  var q=document.getElementById('q'), count=document.getElementById('visible-count');
+  function apply(){
+    var term=(q.value||'').toLowerCase().trim(), visible=0;
+    cards.forEach(function(card){
+      var okStatus=body.dataset.filter==='all'||card.dataset.status===body.dataset.filter;
+      var okText=!term||card.dataset.search.indexOf(term)!==-1;
+      card.hidden=!(okStatus&&okText);
+      if(okStatus&&okText) visible++;
+    });
+    if(count) count.textContent=String(visible);
+  }
+  chips.forEach(function(chip){
+    chip.addEventListener('click',function(){
+      body.dataset.filter=chip.dataset.filter;
+      chips.forEach(function(c){c.setAttribute('aria-pressed',String(c===chip));});
+      apply();
+    });
+  });
+  if(q) q.addEventListener('input',apply);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='/'&&document.activeElement!==q){e.preventDefault();q.focus();}
+    if(e.key==='Escape'){q.value='';apply();q.blur();}
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'),function(btn){
+    btn.addEventListener('click',function(){
+      var text=btn.getAttribute('data-copy');
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){
+          var old=btn.textContent;btn.textContent='copied';setTimeout(function(){btn.textContent=old;},1200);
+        }).catch(function(){});
+      }
+    });
+  });
+  apply();
+})();
+</script>
+</body>
+</html>

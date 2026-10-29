@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fang 73.3% mutation report</title>
+<style>
+:root{
+  --bg:#080a0f; --panel:#0f1219; --panel2:#141925; --line:rgba(255,255,255,.075);
+  --text:#e9ecf4; --muted:#8d94a7; --acid:#c8ff4d; --red:#ff6b6b; --amber:#ffc857;
+  --green:#5ee39a; --blue:#6cc7ff; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0;background:
+  radial-gradient(1100px 520px at 12% -12%,rgba(200,255,77,.10),transparent 62%),
+  radial-gradient(900px 520px at 96% 0%,rgba(108,199,255,.07),transparent 60%),
+  var(--bg);
+  color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--acid)}
+.wrap{max-width:1120px;margin:0 auto;padding:34px 24px 70px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:34px}
+.brand{display:flex;align-items:center;gap:14px}
+.mark{width:42px;height:42px;border-radius:12px;background:var(--acid);display:grid;place-items:center;color:#080a0f;font-family:var(--mono);font-weight:800;font-size:21px;box-shadow:0 0 40px rgba(200,255,77,.28)}
+.wordmark{font-family:var(--mono);font-size:20px;font-weight:700;letter-spacing:.16em}
+.tagline{color:var(--muted);font-size:12.5px;letter-spacing:.04em}
+.meta{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-align:right;line-height:1.7}
+.meta strong{color:var(--text);font-weight:500}
+h1{font-size:clamp(28px,4vw,44px);line-height:1.1;margin:0 0 8px;letter-spacing:-.02em;font-weight:650}
+.sub{color:var(--muted);margin:0 0 30px;max-width:70ch}
+.hero{display:grid;grid-template-columns:270px 1fr;gap:18px;align-items:stretch;margin-bottom:18px}
+.scorecard{background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.012));border:1px solid var(--line);border-radius:20px;padding:26px 22px;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden}
+.scorecard:after{content:"";position:absolute;inset:auto -40px -70px -40px;height:120px;background:radial-gradient(closest-side,rgba(200,255,77,.18),transparent)}
+.ring{position:relative;width:196px;height:196px}
+.ring svg{transform:rotate(-90deg);width:196px;height:196px}
+.ring .track{stroke:rgba(255,255,255,.07);stroke-width:10;fill:none}
+.ring .value{stroke:var(--acid);stroke-width:10;fill:none;stroke-linecap:round;stroke-dasharray:0 999;transition:stroke-dasharray 1.2s cubic-bezier(.2,.7,.2,1)}
+.ring .center{position:absolute;inset:0;display:grid;place-content:center;gap:2px}
+.big{font-family:var(--mono);font-size:42px;font-weight:700;letter-spacing:-.04em;line-height:1}
+.big span{font-size:18px;color:var(--muted);margin-left:2px}
+.grade{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 16px 14px;min-width:0}
+.stat .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;color:var(--muted);text-transform:uppercase}
+.stat .v{font-family:var(--mono);font-size:27px;font-weight:650;margin-top:6px;letter-spacing:-.03em}
+.stat .n{font-size:11.5px;color:var(--muted);margin-top:2px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin:18px 0}
+.panel h2{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 14px;font-weight:600}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:26px 0 14px}
+.chip{appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:7px 12px;font-family:var(--mono);font-size:11.5px;cursor:pointer;transition:.15s}
+.chip:hover{border-color:rgba(255,255,255,.22);color:var(--text)}
+.chip[aria-pressed="true"]{background:var(--text);color:#080a0f;border-color:var(--text)}
+.chip .c{opacity:.55;margin-left:4px}
+.search{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;min-width:230px}
+.search span{color:var(--muted);font-family:var(--mono);font-size:12px}
+.search input{all:unset;color:var(--text);font-family:var(--mono);font-size:12px;width:100%}
+.search input::placeholder{color:#5c6273}
+.list{display:grid;gap:12px}
+.mutant{background:linear-gradient(180deg,rgba(255,255,255,.028),rgba(255,255,255,.008));border:1px solid var(--line);border-radius:15px;padding:15px 17px}
+.mutant[data-status="survived"]{border-left:3px solid var(--red)}
+.mutant[data-status="killed"]{border-left:3px solid rgba(94,227,154,.55)}
+.mutant[data-status="timeout"]{border-left:3px solid var(--amber)}
+.m-head{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-bottom:10px}
+.loc{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--text)}
+.ctx{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.op{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);border:1px solid rgba(108,199,255,.25);background:rgba(108,199,255,.07);border-radius:6px;padding:2px 6px}
+.status{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+.status.survived{color:var(--red);background:rgba(255,107,107,.09);border:1px solid rgba(255,107,107,.3)}
+.status.killed{color:var(--green);background:rgba(94,227,154,.07);border:1px solid rgba(94,227,154,.24)}
+.status.timeout{color:var(--amber);background:rgba(255,200,87,.08);border:1px solid rgba(255,200,87,.28)}
+.status.error,.status.worker_error{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--line)}
+pre.diff{margin:0 0 10px;background:#07090d;border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:11px 13px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+.del{display:block;color:#ff8b8b;white-space:pre-wrap;word-break:break-word}
+.add{display:block;color:#8dffc0;white-space:pre-wrap;word-break:break-word}
+body[data-filter="survived"] .mutant:not([data-status="survived"]),
+body[data-filter="killed"] .mutant:not([data-status="killed"]),
+body[data-filter="timeout"] .mutant:not([data-status="timeout"]),
+body[data-filter="error"] .mutant:not([data-status="error"]),
+body[data-filter="worker_error"] .mutant:not([data-status="worker_error"]){display:none}
+.desc{font-family:var(--mono);font-size:12px;color:#c3c9d8;margin:0 0 5px;word-break:break-word}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.m-foot{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:11px;font-family:var(--mono);font-size:11px;color:#697086}
+.copy{appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:3px 7px;font-family:var(--mono);font-size:10.5px;cursor:pointer}
+.copy:hover{color:var(--text);border-color:rgba(255,255,255,.24)}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
+th{color:var(--muted);font-weight:500;text-align:left;letter-spacing:.06em;text-transform:uppercase;font-size:10px;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid rgba(255,255,255,.04)}
+td.num{text-align:right}
+.fbar{height:7px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;min-width:90px}
+.fbar i{display:block;height:100%;background:var(--acid);border-radius:99px}
+details.learn{margin-top:18px;color:var(--muted);font-size:13.5px}
+details.learn summary{cursor:pointer;color:var(--text);font-family:var(--mono);font-size:12px;letter-spacing:.06em}
+details.learn p{max-width:85ch}
+footer.end{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;color:#5f6575;font-family:var(--mono);font-size:10.5px}
+.note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+.note b{color:var(--amber);font-weight:500}
+@media(max-width:860px){.hero{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.search{margin-left:0;width:100%}.wrap{padding:22px 16px 50px}}
+@media print{body{background:#fff;color:#111}.mutant,.panel,.stat{break-inside:avoid}.toolbar,.copy{display:none}}
+</style>
+</head>
+<body data-filter="survived">
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">F</div>
+      <div>
+        <div class="wordmark">FANG</div>
+        <div class="tagline">your tests pass. do they bite?</div>
+      </div>
+    </div>
+    <div class="meta"><strong>repository root</strong><br>all &middot; 2026-10-29T04:28:21+00:00<br>23 tests &middot; 0.22s suite</div>
+  </header>
+
+  <h1>73.3% mutation score</h1>
+  <p class="sub">Scope: all files · 403 mutants generated · 23 tests collected</p>
+
+  <section class="hero">
+    <div class="scorecard">
+      <div class="ring">
+        <svg viewBox="0 0 196 196" aria-hidden="true">
+          <circle class="track" cx="98" cy="98" r="82"></circle>
+          <circle class="value" cx="98" cy="98" r="82" style="stroke:#ffc857;stroke-dasharray:377.8 137.4"></circle>
+        </svg>
+        <div class="center"><div class="big">73.3<span>%</span></div><div class="grade">B · decent</div></div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">killed</div><div class="v" style="color:var(--green)">44</div><div class="n">mutants your tests noticed</div></div>
+      <div class="stat"><div class="k">survived</div><div class="v" style="color:var(--red)">16</div><div class="n">behaviour changes left unchecked</div></div>
+      <div class="stat"><div class="k">mutants</div><div class="v">60</div><div class="n">of 403 generated</div></div>
+      <div class="stat"><div class="k">run time</div><div class="v">5.7s</div><div class="n">0.22s baseline</div></div>
+    </div>
+  </section>
+
+  <section class="toolbar" aria-label="Filters">
+    <button class="chip" data-filter="all" aria-pressed="false">all<span class="c">60</span></button><button class="chip" data-filter="survived" aria-pressed="true">survived<span class="c">16</span></button><button class="chip" data-filter="killed" aria-pressed="false">killed<span class="c">44</span></button>
+    <label class="search"><span>/</span><input id="q" type="search" placeholder="filter by file, function, test..." autocomplete="off"></label>
+  </section>
+  <p class="note" style="margin:-4px 0 14px">Showing <b id="visible-count">16</b> mutants. Press <code>/</code> to search, <code>Esc</code> to reset.</p>
+
+  <section class="list" aria-label="Mutants">
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 144 _mutationfactory._add return survived `return false` -&gt; `return none` assert the return value; calling the function is not enough.             return false             return none ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:144</span>
+    <span class="ctx">_MutationFactory._add</span>
+    <span class="op">return</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return False</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return False` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"> <span>0.28s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 149 _mutationfactory._add return survived `return false` -&gt; `return none` assert the return value; calling the function is not enough.             return false             return none ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:149</span>
+    <span class="ctx">_MutationFactory._add</span>
+    <span class="op">return</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return False</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return False` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"> <span>0.26s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 156 _mutationfactory._add constant survived `true` -&gt; `false` assert against a different value so this constant is observable.             compile(candidate, self.sf.path, &quot;exec&quot;, dont_inherit=true)             compile(candidate, self.sf.path, &quot;exec&quot;, dont_inherit=false) ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:156</span>
+    <span class="ctx">_MutationFactory._add</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- compile(candidate, self.sf.path, &quot;exec&quot;, dont_inherit=True)</span><span class="add">+ compile(candidate, self.sf.path, &quot;exec&quot;, dont_inherit=False)</span></pre>
+  <p class="desc">`True` -&gt; `False`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.25s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 158 _mutationfactory._add constant survived `false` -&gt; `true` assert against a different value so this constant is observable.             return false             return true ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:158</span>
+    <span class="ctx">_MutationFactory._add</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return False</span><span class="add">+ return True</span></pre>
+  <p class="desc">`False` -&gt; `True`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.25s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 268 _mutationfactory.visit_assign constant survived string &#x27;__&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.             if isinstance(target, ast.name) and target.id.startswith(&quot;__&quot;) and target.id.endswith(&quot;__&quot;):             if isinstance(target, ast.name) and target.id.startswith(&quot;__&quot;) and target.id.endswith(&quot;&quot;): ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:268</span>
+    <span class="ctx">_MutationFactory.visit_Assign</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- if isinstance(target, ast.Name) and target.id.startswith(&quot;__&quot;) and target.id.endswith(&quot;__&quot;):</span><span class="add">+ if isinstance(target, ast.Name) and target.id.startswith(&quot;__&quot;) and target.id.endswith(&quot;&quot;):</span></pre>
+  <p class="desc">string &#x27;__&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.27s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 276 _mutationfactory.visit_annassign statement survived remove `self.visit(node.value)` assert the side effect of this call (state, output, or log).             self.visit(node.value)             pass ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:276</span>
+    <span class="ctx">_MutationFactory.visit_AnnAssign</span>
+    <span class="op">statement</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- self.visit(node.value)</span><span class="add">+ pass</span></pre>
+  <p class="desc">remove `self.visit(node.value)`</p>
+  <p class="hint">Assert the side effect of this call (state, output, or log).</p>
+  <div class="m-foot"> <span>0.28s</span>  <button class="copy" data-copy="Assert the side effect of this call (state, output, or log).">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 283 _mutationfactory._is_main_guard constant survived `false` -&gt; `true` assert against a different value so this constant is observable.             return false             return true ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:283</span>
+    <span class="ctx">_MutationFactory._is_main_guard</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- return False</span><span class="add">+ return True</span></pre>
+  <p class="desc">`False` -&gt; `True`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.25s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 320 _mutationfactory._consider_condition constant survived `64` -&gt; `65` assert against a different value so this constant is observable.             &quot;negate condition `%s`&quot; % truncate(source, 64),             &quot;negate condition `%s`&quot; % truncate(source, 65), ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:320</span>
+    <span class="ctx">_MutationFactory._consider_condition</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;negate condition `%s`&quot; % truncate(source, 64),</span><span class="add">+ &quot;negate condition `%s`&quot; % truncate(source, 65),</span></pre>
+  <p class="desc">`64` -&gt; `65`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.27s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 355 _mutationfactory.visit_boolop arithmetic survived `+` -&gt; `-` in `index + 1` assert the exact numeric result, not just its type.                 found = self._token_between(node.values[index], node.values[index + 1], _bool_pattern)                 found = self._token_between(node.values[index], node.values[index - 1], _bool_pattern) ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:355</span>
+    <span class="ctx">_MutationFactory.visit_BoolOp</span>
+    <span class="op">arithmetic</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- found = self._token_between(node.values[index], node.values[index + 1], _BOOL_PATTERN)</span><span class="add">+ found = self._token_between(node.values[index], node.values[index - 1], _BOOL_PATTERN)</span></pre>
+  <p class="desc">`+` -&gt; `-` in `index + 1`</p>
+  <p class="hint">Assert the exact numeric result, not just its type.</p>
+  <div class="m-foot"> <span>0.28s</span>  <button class="copy" data-copy="Assert the exact numeric result, not just its type.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 415 _mutationfactory.visit_unaryop constant survived `48` -&gt; `49` assert against a different value so this constant is observable.                 &quot;remove negation: `%s` -&gt; `%s`&quot; % (truncate(self.sf.segment(node), 48), truncate(operand, 48)),                 &quot;remove negation: `%s` -&gt; `%s`&quot; % (truncate(self.sf.segment(node), 48), truncate(operand, 49)), ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:415</span>
+    <span class="ctx">_MutationFactory.visit_UnaryOp</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;remove negation: `%s` -&gt; `%s`&quot; % (truncate(self.sf.segment(node), 48), truncate(operand, 48)),</span><span class="add">+ &quot;remove negation: `%s` -&gt; `%s`&quot; % (truncate(self.sf.segment(node), 48), truncate(operand, 49)),</span></pre>
+  <p class="desc">`48` -&gt; `49`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.28s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 426 _mutationfactory.visit_unaryop constant survived `64` -&gt; `65` assert against a different value so this constant is observable.                 &quot;remove `not`: `%s`&quot; % truncate(operand, 64),                 &quot;remove `not`: `%s`&quot; % truncate(operand, 65), ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:426</span>
+    <span class="ctx">_MutationFactory.visit_UnaryOp</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;remove `not`: `%s`&quot; % truncate(operand, 64),</span><span class="add">+ &quot;remove `not`: `%s`&quot; % truncate(operand, 65),</span></pre>
+  <p class="desc">`64` -&gt; `65`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.28s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 428 _mutationfactory.visit_unaryop statement survived remove `self.generic_visit(node)` assert the side effect of this call (state, output, or log).         self.generic_visit(node)         pass ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:428</span>
+    <span class="ctx">_MutationFactory.visit_UnaryOp</span>
+    <span class="op">statement</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- self.generic_visit(node)</span><span class="add">+ pass</span></pre>
+  <p class="desc">remove `self.generic_visit(node)`</p>
+  <p class="hint">Assert the side effect of this call (state, output, or log).</p>
+  <div class="m-foot"> <span>0.30s</span>  <button class="copy" data-copy="Assert the side effect of this call (state, output, or log).">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 438 _mutationfactory.visit_return constant survived `64` -&gt; `65` assert against a different value so this constant is observable.         source = truncate(self.sf.text[start:end], 64)         source = truncate(self.sf.text[start:end], 65) ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:438</span>
+    <span class="ctx">_MutationFactory.visit_Return</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- source = truncate(self.sf.text[start:end], 64)</span><span class="add">+ source = truncate(self.sf.text[start:end], 65)</span></pre>
+  <p class="desc">`64` -&gt; `65`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.27s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 453 _mutationfactory.visit_constant boolean survived `or` -&gt; `and` in `value is none or value is ellipsis` cover a case where only one operand is true.         if value is none or value is ellipsis:         if value is none and value is ellipsis: ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:453</span>
+    <span class="ctx">_MutationFactory.visit_Constant</span>
+    <span class="op">boolean</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- if value is None or value is Ellipsis:</span><span class="add">+ if value is None and value is Ellipsis:</span></pre>
+  <p class="desc">`or` -&gt; `and` in `value is None or value is Ellipsis`</p>
+  <p class="hint">Cover a case where only one operand is true.</p>
+  <div class="m-foot"> <span>0.27s</span>  <button class="copy" data-copy="Cover a case where only one operand is true.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 459 _mutationfactory.visit_constant comparison survived `==` -&gt; `!=` in `value == 1` add a test at the boundary where this comparison flips.             new_value = 1 if value == 0 else (0 if value == 1 else value + 1)             new_value = 1 if value == 0 else (0 if value != 1 else value + 1) ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:459</span>
+    <span class="ctx">_MutationFactory.visit_Constant</span>
+    <span class="op">comparison</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- new_value = 1 if value == 0 else (0 if value == 1 else value + 1)</span><span class="add">+ new_value = 1 if value == 0 else (0 if value != 1 else value + 1)</span></pre>
+  <p class="desc">`==` -&gt; `!=` in `value == 1`</p>
+  <p class="hint">Add a test at the boundary where this comparison flips.</p>
+  <div class="m-foot"> <span>0.28s</span>  <button class="copy" data-copy="Add a test at the boundary where this comparison flips.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="survived" data-search="fang/mutators.py 500 _short_repr constant survived `32` -&gt; `33` assert against a different value so this constant is observable.     if len(text) &gt; 32:     if len(text) &gt; 33: ">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:500</span>
+    <span class="ctx">_short_repr</span>
+    <span class="op">constant</span>
+    <span class="status survived">survived</span>
+  </div>
+  <pre class="diff"><span class="del">- if len(text) &gt; 32:</span><span class="add">+ if len(text) &gt; 33:</span></pre>
+  <p class="desc">`32` -&gt; `33`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"> <span>0.26s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 18  constant killed string &#x27;statement&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     &quot;statement&quot;: &quot;statement removal&quot;,     &quot;&quot;: &quot;statement removal&quot;, tests.test_mutators.testmutators.test_multiline_statement_removal">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:18</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;statement&quot;: &quot;statement removal&quot;,</span><span class="add">+ &quot;&quot;: &quot;statement removal&quot;,</span></pre>
+  <p class="desc">string &#x27;statement&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_multiline_statement_removal</b></span> <span>0.26s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 25  constant killed string &#x27;!=&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     ast.noteq: &quot;!=&quot;,     ast.noteq: &quot;&quot;, tests.test_mutators.testmutators.test_comparison_replacement">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:25</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- ast.NotEq: &quot;!=&quot;,</span><span class="add">+ ast.NotEq: &quot;&quot;,</span></pre>
+  <p class="desc">string &#x27;!=&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_comparison_replacement</b></span> <span>0.28s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 29  constant killed string &#x27;&gt;=&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     ast.gte: &quot;&gt;=&quot;,     ast.gte: &quot;&quot;, tests.test_mutators.testmutators.test_every_comparison_operator">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:29</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- ast.GtE: &quot;&gt;=&quot;,</span><span class="add">+ ast.GtE: &quot;&quot;,</span></pre>
+  <p class="desc">string &#x27;&gt;=&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_every_comparison_operator</b></span> <span>0.26s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 31  constant killed string &#x27;is not&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     ast.isnot: &quot;is not&quot;,     ast.isnot: &quot;&quot;, tests.test_mutators.testmutators.test_every_comparison_operator">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:31</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- ast.IsNot: &quot;is not&quot;,</span><span class="add">+ ast.IsNot: &quot;&quot;,</span></pre>
+  <p class="desc">string &#x27;is not&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_every_comparison_operator</b></span> <span>0.27s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 39  constant killed string &#x27;&lt;&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     &quot;&lt;&quot;: &quot;&lt;=&quot;,     &quot;&quot;: &quot;&lt;=&quot;, tests.test_mutators.testmutators.test_comparison_replacement">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:39</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;&lt;&quot;: &quot;&lt;=&quot;,</span><span class="add">+ &quot;&quot;: &quot;&lt;=&quot;,</span></pre>
+  <p class="desc">string &#x27;&lt;&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_comparison_replacement</b></span> <span>0.28s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 43  constant killed string &#x27;is not&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     &quot;is&quot;: &quot;is not&quot;,     &quot;is&quot;: &quot;&quot;, tests.test_mutators.testmutators.test_every_comparison_operator">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:43</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;is&quot;: &quot;is not&quot;,</span><span class="add">+ &quot;is&quot;: &quot;&quot;,</span></pre>
+  <p class="desc">string &#x27;is not&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_every_comparison_operator</b></span> <span>0.28s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 44  constant killed string &#x27;is not&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     &quot;is not&quot;: &quot;is&quot;,     &quot;&quot;: &quot;is&quot;, tests.test_mutators.testmutators.test_every_comparison_operator">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:44</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;is not&quot;: &quot;is&quot;,</span><span class="add">+ &quot;&quot;: &quot;is&quot;,</span></pre>
+  <p class="desc">string &#x27;is not&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_every_comparison_operator</b></span> <span>0.25s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 50  constant killed string &#x27;-&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     ast.add: (&quot;+&quot;, &quot;-&quot;),     ast.add: (&quot;+&quot;, &quot;&quot;), tests.test_mutators.testmutators.test_every_arithmetic_operator">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:50</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- ast.Add: (&quot;+&quot;, &quot;-&quot;),</span><span class="add">+ ast.Add: (&quot;+&quot;, &quot;&quot;),</span></pre>
+  <p class="desc">string &#x27;-&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_every_arithmetic_operator</b></span> <span>0.25s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 59  constant killed string &#x27;-=&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     ast.sub: (&quot;-=&quot;, &quot;+=&quot;),     ast.sub: (&quot;&quot;, &quot;+=&quot;), tests.test_mutators.testmutators.test_every_arithmetic_operator">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:59</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- ast.Sub: (&quot;-=&quot;, &quot;+=&quot;),</span><span class="add">+ ast.Sub: (&quot;&quot;, &quot;+=&quot;),</span></pre>
+  <p class="desc">string &#x27;-=&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_every_arithmetic_operator</b></span> <span>0.27s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 61  constant killed string &#x27;/=&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     ast.div: (&quot;/=&quot;, &quot;*=&quot;),     ast.div: (&quot;&quot;, &quot;*=&quot;), tests.test_mutators.testmutators.test_every_arithmetic_operator">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:61</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- ast.Div: (&quot;/=&quot;, &quot;*=&quot;),</span><span class="add">+ ast.Div: (&quot;&quot;, &quot;*=&quot;),</span></pre>
+  <p class="desc">string &#x27;/=&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_every_arithmetic_operator</b></span> <span>0.25s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 61  constant killed string &#x27;*=&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     ast.div: (&quot;/=&quot;, &quot;*=&quot;),     ast.div: (&quot;/=&quot;, &quot;&quot;), tests.test_mutators.testmutators.test_every_arithmetic_operator">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:61</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- ast.Div: (&quot;/=&quot;, &quot;*=&quot;),</span><span class="add">+ ast.Div: (&quot;/=&quot;, &quot;&quot;),</span></pre>
+  <p class="desc">string &#x27;*=&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_every_arithmetic_operator</b></span> <span>0.27s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 66  constant killed string &#x27;\\bnot\\s+in\\b|\\bis\\s+not... -&gt; &quot;&quot; assert against a different value so this constant is observable.     r&quot;\bnot\s+in\b|\bis\s+not\b|==|!=|&lt;=|&gt;=|&lt;|&gt;|\bin\b|\bis\b&quot;     &quot;&quot; tests.test_mutators.testmutators.test_mutated_line">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:66</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- r&quot;\bnot\s+in\b|\bis\s+not\b|==|!=|&lt;=|&gt;=|&lt;|&gt;|\bin\b|\bis\b&quot;</span><span class="add">+ &quot;&quot;</span></pre>
+  <p class="desc">string &#x27;\\bnot\\s+in\\b|\\bis\\s+not... -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_mutated_line</b></span> <span>0.25s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 71  constant killed string &#x27;add a test at the boundary w... -&gt; &quot;&quot; assert against a different value so this constant is observable.     &quot;comparison&quot;: &quot;add a test at the boundary where this comparison flips.&quot;,     &quot;comparison&quot;: &quot;&quot;, tests.test_mutators.testmutators.test_descriptions_and_hints_are_present">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:71</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;comparison&quot;: &quot;Add a test at the boundary where this comparison flips.&quot;,</span><span class="add">+ &quot;comparison&quot;: &quot;&quot;,</span></pre>
+  <p class="desc">string &#x27;Add a test at the boundary w... -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_descriptions_and_hints_are_present</b></span> <span>0.27s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 75  constant killed string &#x27;return&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.     &quot;return&quot;: &quot;assert the return value; calling the function is not enough.&quot;,     &quot;&quot;: &quot;assert the return value; calling the function is not enough.&quot;, tests.test_mutators.testmutators.test_descriptions_and_hints_are_present">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:75</span>
+    <span class="ctx">module</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;return&quot;: &quot;Assert the return value; calling the function is not enough.&quot;,</span><span class="add">+ &quot;&quot;: &quot;Assert the return value; calling the function is not enough.&quot;,</span></pre>
+  <p class="desc">string &#x27;return&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_descriptions_and_hints_are_present</b></span> <span>0.25s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 112 _mutationfactory._collect_docstrings boolean killed `and` -&gt; `or` in `isinstance(node, holders) and node.body` cover a case where only one operand is true.             if isinstance(node, holders) and node.body:             if isinstance(node, holders) or node.body: tests.test_mutators.testmutators.test_all_mutants_compile">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:112</span>
+    <span class="ctx">_MutationFactory._collect_docstrings</span>
+    <span class="op">boolean</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if isinstance(node, holders) and node.body:</span><span class="add">+ if isinstance(node, holders) or node.body:</span></pre>
+  <p class="desc">`and` -&gt; `or` in `isinstance(node, holders) and node.body`</p>
+  <p class="hint">Cover a case where only one operand is true.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_all_mutants_compile</b></span> <span>0.20s</span>  <button class="copy" data-copy="Cover a case where only one operand is true.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 115 _mutationfactory._collect_docstrings conditional killed negate condition `isinstance(first, ast.expr) and isinstance(first.value, ast.c...` test the branch this condition guards, not only the happy path.                     isinstance(first, ast.expr)  tests.test_mutators.testmutators.test_all_mutants_compile">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:115</span>
+    <span class="ctx">_MutationFactory._collect_docstrings</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- isinstance(first, ast.Expr)
+                    and isinstance(first.value, ast.Constant)
+                    and isinstance(first.value.value, str)</span><span class="add">+ not (isinstance(first, ast.Expr)
+                    and isinstance(first.value, ast.Constant)
+                    and isinstance(first.value.value, str))</span></pre>
+  <p class="desc">negate condition `isinstance(first, ast.Expr) and isinstance(first.value, ast.C...`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_all_mutants_compile</b></span> <span>0.22s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 122 _mutationfactory._context_name constant killed string &#x27;.&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.         return &quot;.&quot;.join(self.context)         return &quot;&quot;.join(self.context) tests.test_mutators.testmutators.test_context_is_dotted">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:122</span>
+    <span class="ctx">_MutationFactory._context_name</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return &quot;.&quot;.join(self.context)</span><span class="add">+ return &quot;&quot;.join(self.context)</span></pre>
+  <p class="desc">string &#x27;.&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_context_is_dotted</b></span> <span>0.25s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 125 _mutationfactory._in_scope comparison killed `is` -&gt; `is not` in `self.only_lines is none` add a test at the boundary where this comparison flips.         if self.only_lines is none:         if self.only_lines is not none: tests.test_mutators.testmutators.test_all_mutants_compile">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:125</span>
+    <span class="ctx">_MutationFactory._in_scope</span>
+    <span class="op">comparison</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if self.only_lines is None:</span><span class="add">+ if self.only_lines is not None:</span></pre>
+  <p class="desc">`is` -&gt; `is not` in `self.only_lines is None`</p>
+  <p class="hint">Add a test at the boundary where this comparison flips.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_all_mutants_compile</b></span> <span>0.20s</span>  <button class="copy" data-copy="Add a test at the boundary where this comparison flips.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 129 _mutationfactory._in_scope return killed `return any(line in self.only_lines for line in range(first, l...` -&gt; `return none` assert the return value; calling the function is not enough.         return any(line in self.only_lines for line in range(first, last + 1))         return none tests.test_mutators.testmutators.test_only_lines_filters">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:129</span>
+    <span class="ctx">_MutationFactory._in_scope</span>
+    <span class="op">return</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return any(line in self.only_lines for line in range(first, last + 1))</span><span class="add">+ return None</span></pre>
+  <p class="desc">`return any(line in self.only_lines for line in range(first, l...` -&gt; `return None`</p>
+  <p class="hint">Assert the return value; calling the function is not enough.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_only_lines_filters</b></span> <span>0.28s</span>  <button class="copy" data-copy="Assert the return value; calling the function is not enough.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 169 _mutationfactory._add conditional killed negate condition `line == end_line` test the branch this condition guards, not only the happy path.         if line == end_line:         if not (line == end_line): tests.test_mutators.testmutators.test_mutated_line">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:169</span>
+    <span class="ctx">_MutationFactory._add</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if line == end_line:</span><span class="add">+ if not (line == end_line):</span></pre>
+  <p class="desc">negate condition `line == end_line`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_mutated_line</b></span> <span>0.27s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 172 _mutationfactory._add arithmetic killed `+` -&gt; `-` in `source_line[: col - 1] + replacement` assert the exact numeric result, not just its type.                 + replacement                 - replacement tests.test_mutators.testmutators.test_all_mutants_compile">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:172</span>
+    <span class="ctx">_MutationFactory._add</span>
+    <span class="op">arithmetic</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- + replacement</span><span class="add">+ - replacement</span></pre>
+  <p class="desc">`+` -&gt; `-` in `source_line[: col - 1] + replacement`</p>
+  <p class="hint">Assert the exact numeric result, not just its type.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_all_mutants_compile</b></span> <span>0.22s</span>  <button class="copy" data-copy="Assert the exact numeric result, not just its type.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 227 _mutationfactory._find_text_between arithmetic killed `+` -&gt; `-` in `start + index` assert the exact numeric result, not just its type.         return start + index, start + index + len(needle), needle         return start - index, start + index + len(needle), needle tests.test_mutators.testmutators.test_every_arithmetic_operator">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:227</span>
+    <span class="ctx">_MutationFactory._find_text_between</span>
+    <span class="op">arithmetic</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return start + index, start + index + len(needle), needle</span><span class="add">+ return start - index, start + index + len(needle), needle</span></pre>
+  <p class="desc">`+` -&gt; `-` in `start + index`</p>
+  <p class="hint">Assert the exact numeric result, not just its type.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_every_arithmetic_operator</b></span> <span>0.28s</span>  <button class="copy" data-copy="Assert the exact numeric result, not just its type.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 281 _mutationfactory._is_main_guard constant killed `false` -&gt; `true` assert against a different value so this constant is observable.             return false             return true tests.test_mutators.testmutators.test_mutated_line">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:281</span>
+    <span class="ctx">_MutationFactory._is_main_guard</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return False</span><span class="add">+ return True</span></pre>
+  <p class="desc">`False` -&gt; `True`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_mutated_line</b></span> <span>0.25s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 285 _mutationfactory._is_main_guard comparison killed `==` -&gt; `!=` in `comparator.value == &quot;__main__&quot;` add a test at the boundary where this comparison flips.             if isinstance(op, ast.eq) and isinstance(comparator, ast.constant) and comparator.value == &quot;__main__&quot;:             if isinstance(op, ast.eq) and isinstance(comparator, ast.constant) and comparator.value != &quot;__main__&quot;: tests.test_mutators.testmutators.test_skips_docstrings_main_guard_and_imports">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:285</span>
+    <span class="ctx">_MutationFactory._is_main_guard</span>
+    <span class="op">comparison</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if isinstance(op, ast.Eq) and isinstance(comparator, ast.Constant) and comparator.value == &quot;__main__&quot;:</span><span class="add">+ if isinstance(op, ast.Eq) and isinstance(comparator, ast.Constant) and comparator.value != &quot;__main__&quot;:</span></pre>
+  <p class="desc">`==` -&gt; `!=` in `comparator.value == &quot;__main__&quot;`</p>
+  <p class="hint">Add a test at the boundary where this comparison flips.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_skips_docstrings_main_guard_and_imports</b></span> <span>0.28s</span>  <button class="copy" data-copy="Add a test at the boundary where this comparison flips.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 286 _mutationfactory._is_main_guard constant killed `true` -&gt; `false` assert against a different value so this constant is observable.                 return true                 return false tests.test_mutators.testmutators.test_skips_docstrings_main_guard_and_imports">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:286</span>
+    <span class="ctx">_MutationFactory._is_main_guard</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- return True</span><span class="add">+ return False</span></pre>
+  <p class="desc">`True` -&gt; `False`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_skips_docstrings_main_guard_and_imports</b></span> <span>0.28s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 320 _mutationfactory._consider_condition constant killed string &#x27;negate condition `%s`&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.             &quot;negate condition `%s`&quot; % truncate(source, 64),             &quot;&quot; % truncate(source, 64), tests.test_mutators.testmutators.test_all_mutants_compile">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:320</span>
+    <span class="ctx">_MutationFactory._consider_condition</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;negate condition `%s`&quot; % truncate(source, 64),</span><span class="add">+ &quot;&quot; % truncate(source, 64),</span></pre>
+  <p class="desc">string &#x27;negate condition `%s`&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_all_mutants_compile</b></span> <span>0.22s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 330 _mutationfactory.visit_compare constant killed `1` -&gt; `0` assert against a different value so this constant is observable.                 found = self._token_between(operands[index], operands[index + 1], _compare_pattern)                 found = self._token_between(operands[index], operands[index + 0], _compare_pattern) tests.test_mutators.testmutators.test_mutated_line">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:330</span>
+    <span class="ctx">_MutationFactory.visit_Compare</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- found = self._token_between(operands[index], operands[index + 1], _COMPARE_PATTERN)</span><span class="add">+ found = self._token_between(operands[index], operands[index + 0], _COMPARE_PATTERN)</span></pre>
+  <p class="desc">`1` -&gt; `0`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_mutated_line</b></span> <span>0.27s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 337 _mutationfactory.visit_compare comparison killed `is` -&gt; `is not` in `replacement is none` add a test at the boundary where this comparison flips.                 if replacement is none:                 if replacement is not none: tests.test_mutators.testmutators.test_mutated_line">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:337</span>
+    <span class="ctx">_MutationFactory.visit_Compare</span>
+    <span class="op">comparison</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if replacement is None:</span><span class="add">+ if replacement is not None:</span></pre>
+  <p class="desc">`is` -&gt; `is not` in `replacement is None`</p>
+  <p class="hint">Add a test at the boundary where this comparison flips.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_mutated_line</b></span> <span>0.26s</span>  <button class="copy" data-copy="Add a test at the boundary where this comparison flips.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 339 _mutationfactory.visit_compare statement killed remove `self._add( &quot;comparison&quot;, start, end, replacement, node, &quot;`%s`...` assert the side effect of this call (state, output, or log).                 self._add(  tests.test_mutators.testmutators.test_mutated_line">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:339</span>
+    <span class="ctx">_MutationFactory.visit_Compare</span>
+    <span class="op">statement</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- self._add(
+                    &quot;comparison&quot;,
+                    start,
+                    end,
+                    replacement,
+                    node,
+                    &quot;`%s` -&gt; `%s` in `%s`&quot;
+                    % (token, replacement, truncate(self.sf.segment(node), 64)),
+                )</span><span class="add">+ pass</span></pre>
+  <p class="desc">remove `self._add( &quot;comparison&quot;, start, end, replacement, node, &quot;`%s`...`</p>
+  <p class="hint">Assert the side effect of this call (state, output, or log).</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_mutated_line</b></span> <span>0.27s</span>  <button class="copy" data-copy="Assert the side effect of this call (state, output, or log).">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 351 _mutationfactory.visit_boolop comparison killed `in` -&gt; `not in` in `&quot;boolean&quot; in self.operators` add a test at the boundary where this comparison flips.         if &quot;boolean&quot; in self.operators:         if &quot;boolean&quot; not in self.operators: tests.test_mutators.testmutators.test_boolean_operators">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:351</span>
+    <span class="ctx">_MutationFactory.visit_BoolOp</span>
+    <span class="op">comparison</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if &quot;boolean&quot; in self.operators:</span><span class="add">+ if &quot;boolean&quot; not in self.operators:</span></pre>
+  <p class="desc">`in` -&gt; `not in` in `&quot;boolean&quot; in self.operators`</p>
+  <p class="hint">Add a test at the boundary where this comparison flips.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_boolean_operators</b></span> <span>0.25s</span>  <button class="copy" data-copy="Add a test at the boundary where this comparison flips.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 353 _mutationfactory.visit_boolop constant killed string &#x27;or&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.             replacement = &quot;or&quot; if token == &quot;and&quot; else &quot;and&quot;             replacement = &quot;&quot; if token == &quot;and&quot; else &quot;and&quot; tests.test_mutators.testmutators.test_boolean_operators">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:353</span>
+    <span class="ctx">_MutationFactory.visit_BoolOp</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- replacement = &quot;or&quot; if token == &quot;and&quot; else &quot;and&quot;</span><span class="add">+ replacement = &quot;&quot; if token == &quot;and&quot; else &quot;and&quot;</span></pre>
+  <p class="desc">string &#x27;or&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_boolean_operators</b></span> <span>0.28s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 361 _mutationfactory.visit_boolop statement killed remove `self._add( &quot;boolean&quot;, start, end, replacement, node, &quot;`%s` -&gt;...` assert the side effect of this call (state, output, or log).                 self._add(  tests.test_mutators.testmutators.test_boolean_operators">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:361</span>
+    <span class="ctx">_MutationFactory.visit_BoolOp</span>
+    <span class="op">statement</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- self._add(
+                    &quot;boolean&quot;,
+                    start,
+                    end,
+                    replacement,
+                    node,
+                    &quot;`%s` -&gt; `%s` in `%s`&quot;
+                    % (token, replacement, truncate(self.sf.segment(node), 64)),
+                )</span><span class="add">+ pass</span></pre>
+  <p class="desc">remove `self._add( &quot;boolean&quot;, start, end, replacement, node, &quot;`%s` -&gt;...`</p>
+  <p class="hint">Assert the side effect of this call (state, output, or log).</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_boolean_operators</b></span> <span>0.28s</span>  <button class="copy" data-copy="Assert the side effect of this call (state, output, or log).">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 376 _mutationfactory.visit_binop conditional killed negate condition `found` test the branch this condition guards, not only the happy path.             if found:             if not (found): tests.test_mutators.testmutators.test_every_arithmetic_operator">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:376</span>
+    <span class="ctx">_MutationFactory.visit_BinOp</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if found:</span><span class="add">+ if not (found):</span></pre>
+  <p class="desc">negate condition `found`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_every_arithmetic_operator</b></span> <span>0.27s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 387 _mutationfactory.visit_binop statement killed remove `self.generic_visit(node)` assert the side effect of this call (state, output, or log).         self.generic_visit(node)         pass tests.test_mutators.testmutators.test_every_arithmetic_operator">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:387</span>
+    <span class="ctx">_MutationFactory.visit_BinOp</span>
+    <span class="op">statement</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- self.generic_visit(node)</span><span class="add">+ pass</span></pre>
+  <p class="desc">remove `self.generic_visit(node)`</p>
+  <p class="hint">Assert the side effect of this call (state, output, or log).</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_every_arithmetic_operator</b></span> <span>0.25s</span>  <button class="copy" data-copy="Assert the side effect of this call (state, output, or log).">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 406 _mutationfactory.visit_unaryop boolean killed `and` -&gt; `or` in `isinstance(node.op, ast.usub) and &quot;arithmetic&quot; in self.operators` cover a case where only one operand is true.         if isinstance(node.op, ast.usub) and &quot;arithmetic&quot; in self.operators:         if isinstance(node.op, ast.usub) or &quot;arithmetic&quot; in self.operators: tests.test_mutators.testmutators.test_boolean_operators">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:406</span>
+    <span class="ctx">_MutationFactory.visit_UnaryOp</span>
+    <span class="op">boolean</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if isinstance(node.op, ast.USub) and &quot;arithmetic&quot; in self.operators:</span><span class="add">+ if isinstance(node.op, ast.USub) or &quot;arithmetic&quot; in self.operators:</span></pre>
+  <p class="desc">`and` -&gt; `or` in `isinstance(node.op, ast.USub) and &quot;arithmetic&quot; in self.operators`</p>
+  <p class="hint">Cover a case where only one operand is true.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_boolean_operators</b></span> <span>0.28s</span>  <button class="copy" data-copy="Cover a case where only one operand is true.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 417 _mutationfactory.visit_unaryop constant killed string &#x27;boolean&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.         elif isinstance(node.op, ast.not) and &quot;boolean&quot; in self.operators:         elif isinstance(node.op, ast.not) and &quot;&quot; in self.operators: tests.test_mutators.testmutators.test_boolean_operators">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:417</span>
+    <span class="ctx">_MutationFactory.visit_UnaryOp</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- elif isinstance(node.op, ast.Not) and &quot;boolean&quot; in self.operators:</span><span class="add">+ elif isinstance(node.op, ast.Not) and &quot;&quot; in self.operators:</span></pre>
+  <p class="desc">string &#x27;boolean&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_boolean_operators</b></span> <span>0.26s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 433 _mutationfactory.visit_return boolean killed `and` -&gt; `or` in `isinstance(node.value, ast.constant) and node.value.value is ...` cover a case where only one operand is true.         if isinstance(node.value, ast.constant) and node.value.value is none:         if isinstance(node.value, ast.constant) or node.value.value is none: tests.test_mutators.testmutators.test_all_mutants_compile">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:433</span>
+    <span class="ctx">_MutationFactory.visit_Return</span>
+    <span class="op">boolean</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if isinstance(node.value, ast.Constant) and node.value.value is None:</span><span class="add">+ if isinstance(node.value, ast.Constant) or node.value.value is None:</span></pre>
+  <p class="desc">`and` -&gt; `or` in `isinstance(node.value, ast.Constant) and node.value.value is ...`</p>
+  <p class="hint">Cover a case where only one operand is true.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_all_mutants_compile</b></span> <span>0.25s</span>  <button class="copy" data-copy="Cover a case where only one operand is true.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 435 _mutationfactory.visit_return boolean killed `and` -&gt; `or` in `self.context and self.context[-1] == &quot;__init__&quot;` cover a case where only one operand is true.         if self.context and self.context[-1] == &quot;__init__&quot;:         if self.context or self.context[-1] == &quot;__init__&quot;: tests.test_mutators.testmutators.test_all_mutants_compile">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:435</span>
+    <span class="ctx">_MutationFactory.visit_Return</span>
+    <span class="op">boolean</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if self.context and self.context[-1] == &quot;__init__&quot;:</span><span class="add">+ if self.context or self.context[-1] == &quot;__init__&quot;:</span></pre>
+  <p class="desc">`and` -&gt; `or` in `self.context and self.context[-1] == &quot;__init__&quot;`</p>
+  <p class="hint">Cover a case where only one operand is true.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_all_mutants_compile</b></span> <span>0.25s</span>  <button class="copy" data-copy="Cover a case where only one operand is true.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 440 _mutationfactory.visit_return constant killed string &#x27;return&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.             &quot;return&quot;,             &quot;&quot;, tests.test_mutators.testmutators.test_operators_present">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:440</span>
+    <span class="ctx">_MutationFactory.visit_Return</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;return&quot;,</span><span class="add">+ &quot;&quot;,</span></pre>
+  <p class="desc">string &#x27;return&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_operators_present</b></span> <span>0.24s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 445 _mutationfactory.visit_return constant killed string &#x27;`%s` -&gt; `return none`&#x27; -&gt; &quot;&quot; assert against a different value so this constant is observable.             &quot;`%s` -&gt; `return none`&quot; % source,             &quot;&quot; % source, tests.test_mutators.testmutators.test_all_mutants_compile">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:445</span>
+    <span class="ctx">_MutationFactory.visit_Return</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- &quot;`%s` -&gt; `return None`&quot; % source,</span><span class="add">+ &quot;&quot; % source,</span></pre>
+  <p class="desc">string &#x27;`%s` -&gt; `return None`&#x27; -&gt; &quot;&quot;</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_all_mutants_compile</b></span> <span>0.24s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 450 _mutationfactory.visit_constant conditional killed negate condition `&quot;constant&quot; not in self.operators or id(node) in self.docstrings` test the branch this condition guards, not only the happy path.         if &quot;constant&quot; not in self.operators or id(node) in self.docstrings:         if not (&quot;constant&quot; not in self.operators or id(node) in self.docstrings): tests.test_mutators.testmutators.test_empty_string_and_bytes_constants">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:450</span>
+    <span class="ctx">_MutationFactory.visit_Constant</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if &quot;constant&quot; not in self.operators or id(node) in self.docstrings:</span><span class="add">+ if not (&quot;constant&quot; not in self.operators or id(node) in self.docstrings):</span></pre>
+  <p class="desc">negate condition `&quot;constant&quot; not in self.operators or id(node) in self.docstrings`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_empty_string_and_bytes_constants</b></span> <span>0.25s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 453 _mutationfactory.visit_constant conditional killed negate condition `value is none or value is ellipsis` test the branch this condition guards, not only the happy path.         if value is none or value is ellipsis:         if not (value is none or value is ellipsis): tests.test_mutators.testmutators.test_empty_string_and_bytes_constants">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:453</span>
+    <span class="ctx">_MutationFactory.visit_Constant</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if value is None or value is Ellipsis:</span><span class="add">+ if not (value is None or value is Ellipsis):</span></pre>
+  <p class="desc">negate condition `value is None or value is Ellipsis`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_empty_string_and_bytes_constants</b></span> <span>0.27s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 463 _mutationfactory.visit_constant constant killed `1.0` -&gt; `2.0` assert against a different value so this constant is observable.             new_value = 1.0 if value == 0.0 else value + 1.0             new_value = 2.0 if value == 0.0 else value + 1.0 tests.test_mutators.testmutators.test_empty_string_and_bytes_constants">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:463</span>
+    <span class="ctx">_MutationFactory.visit_Constant</span>
+    <span class="op">constant</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- new_value = 1.0 if value == 0.0 else value + 1.0</span><span class="add">+ new_value = 2.0 if value == 0.0 else value + 1.0</span></pre>
+  <p class="desc">`1.0` -&gt; `2.0`</p>
+  <p class="hint">Assert against a different value so this constant is observable.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_empty_string_and_bytes_constants</b></span> <span>0.26s</span>  <button class="copy" data-copy="Assert against a different value so this constant is observable.">copy hint</button></div>
+</article>
+<article class="mutant" data-status="killed" data-search="fang/mutators.py 484 _mutationfactory.visit_expr conditional killed negate condition `name.lower() not in self.skip_calls` test the branch this condition guards, not only the happy path.             if name.lower() not in self.skip_calls:             if not (name.lower() not in self.skip_calls): tests.test_mutators.testmutators.test_multiline_statement_removal">
+  <div class="m-head">
+    <span class="loc">fang/mutators.py:484</span>
+    <span class="ctx">_MutationFactory.visit_Expr</span>
+    <span class="op">conditional</span>
+    <span class="status killed">killed</span>
+  </div>
+  <pre class="diff"><span class="del">- if name.lower() not in self.skip_calls:</span><span class="add">+ if not (name.lower() not in self.skip_calls):</span></pre>
+  <p class="desc">negate condition `name.lower() not in self.skip_calls`</p>
+  <p class="hint">Test the branch this condition guards, not only the happy path.</p>
+  <div class="m-foot"><span>killed by <b>tests.test_mutators.TestMutators.test_multiline_statement_removal</b></span> <span>0.23s</span>  <button class="copy" data-copy="Test the branch this condition guards, not only the happy path.">copy hint</button></div>
+</article></section>
+
+  <section class="panel">
+    <h2>Files</h2>
+    <table><thead><tr><th>file</th><th class="num">killed</th><th class="num">survived</th><th class="num">score</th><th></th></tr></thead>
+    <tbody><tr><td>fang/mutators.py</td><td class="num">44</td><td class="num">16</td><td class="num">73%</td><td><div class="fbar"><i style="width:73.3%"></i></div></td></tr></tbody></table>
+  </section>
+
+  <div class="panel"><h2>Notes</h2><p class="note">sampled 60 of 403 mutants (seed 0); score is an estimate</p></div>
+
+  <details class="learn">
+    <summary>How to read this report</summary>
+    <p><strong>Mutation score</strong> is the share of generated mutants your suite detected. A mutant is a small, syntactically valid change to your code: a flipped comparison, a changed constant, a removed return value. If the suite still passes, the mutant <em>survived</em>, which means no test observed that behaviour.</p>
+    <p>Survivors are not automatically bugs. Some mutants are <em>equivalent</em> (the change cannot alter observable behaviour, such as changing the rounding precision of a value that is already exact). Treat survivors as questions, not verdicts. The hint on each card suggests the kind of assertion that would settle it.</p>
+    <p>Fang only mutates the lines in scope, runs the suite with fail-fast, and treats a timeout or a crash caused by the mutant as detection. A green baseline is required; a red suite cannot distinguish a surviving mutant from a pre-existing failure.</p>
+    <p>Sampled 60 of 403 mutants. The score is an estimate; the 95% Wilson interval is 61.0% to 82.9%.</p>
+  </details>
+
+  <footer class="end">
+    <span>generated by fang 0.1.0 &middot; zero runtime dependencies</span>
+    <span>python -m unittest tests.test_mutators</span>
+  </footer>
+</div>
+<script id="fang-data" type="application/json">{"tool": "fang", "version": "0.1.0", "root": "repository root", "mode": "all", "diff_base": null, "started_at": "2026-10-29T04:28:21+00:00", "duration": 5.672, "baseline_duration": 0.219, "test_label": "python -m unittest tests.test_mutators", "test_command": "python -m unittest tests.test_mutators", "files_scanned": 1, "mutants_total": 403, "mutants_considered": 60, "sampled": true, "sample_size": 60, "python_version": "3.9.13", "git_head": "b3a7102", "cache_hits": 0, "tests_collected": 23, "timeout": 5.0, "score": 73.33, "score_ci": [60.99, 82.87], "killed": 44, "survived": 16, "timeout_count": 0, "error_count": 0, "worker_error_count": 0, "notes": ["sampled 60 of 403 mutants (seed 0); score is an estimate"], "operators": {"constant": {"killed": 24, "survived": 9}, "boolean": {"killed": 4, "survived": 1}, "conditional": {"killed": 6, "survived": 0}, "comparison": {"killed": 4, "survived": 1}, "return": {"killed": 1, "survived": 2}, "arithmetic": {"killed": 2, "survived": 1}, "statement": {"killed": 3, "survived": 2}}, "results": [{"id": "a174f8c71a3b", "path": "fang/mutators.py", "line": 18, "col": 5, "end_line": 18, "end_col": 16, "operator": "constant", "context": "", "original": "\"statement\"", "replacement": "\"\"", "expression_before": "\"statement\"", "expression_after": "\"\"", "source_line": "    \"statement\": \"statement removal\",", "mutated_line": "    \"\": \"statement removal\",", "description": "string 'statement' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.265, "killer": "tests.test_mutators.TestMutators.test_multiline_statement_removal", "cached": false}, {"id": "d652705c51aa", "path": "fang/mutators.py", "line": 25, "col": 16, "end_line": 25, "end_col": 20, "operator": "constant", "context": "", "original": "\"!=\"", "replacement": "\"\"", "expression_before": "\"!=\"", "expression_after": "\"\"", "source_line": "    ast.NotEq: \"!=\",", "mutated_line": "    ast.NotEq: \"\",", "description": "string '!=' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.281, "killer": "tests.test_mutators.TestMutators.test_comparison_replacement", "cached": false}, {"id": "3f8c6230ec75", "path": "fang/mutators.py", "line": 29, "col": 14, "end_line": 29, "end_col": 18, "operator": "constant", "context": "", "original": "\">=\"", "replacement": "\"\"", "expression_before": "\">=\"", "expression_after": "\"\"", "source_line": "    ast.GtE: \">=\",", "mutated_line": "    ast.GtE: \"\",", "description": "string '>=' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.265, "killer": "tests.test_mutators.TestMutators.test_every_comparison_operator", "cached": false}, {"id": "734d26b3e236", "path": "fang/mutators.py", "line": 31, "col": 16, "end_line": 31, "end_col": 24, "operator": "constant", "context": "", "original": "\"is not\"", "replacement": "\"\"", "expression_before": "\"is not\"", "expression_after": "\"\"", "source_line": "    ast.IsNot: \"is not\",", "mutated_line": "    ast.IsNot: \"\",", "description": "string 'is not' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.266, "killer": "tests.test_mutators.TestMutators.test_every_comparison_operator", "cached": false}, {"id": "c483b3a78436", "path": "fang/mutators.py", "line": 39, "col": 5, "end_line": 39, "end_col": 8, "operator": "constant", "context": "", "original": "\"<\"", "replacement": "\"\"", "expression_before": "\"<\"", "expression_after": "\"\"", "source_line": "    \"<\": \"<=\",", "mutated_line": "    \"\": \"<=\",", "description": "string '<' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.281, "killer": "tests.test_mutators.TestMutators.test_comparison_replacement", "cached": false}, {"id": "de944847c9a0", "path": "fang/mutators.py", "line": 43, "col": 11, "end_line": 43, "end_col": 19, "operator": "constant", "context": "", "original": "\"is not\"", "replacement": "\"\"", "expression_before": "\"is not\"", "expression_after": "\"\"", "source_line": "    \"is\": \"is not\",", "mutated_line": "    \"is\": \"\",", "description": "string 'is not' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.281, "killer": "tests.test_mutators.TestMutators.test_every_comparison_operator", "cached": false}, {"id": "bdac7a5e5232", "path": "fang/mutators.py", "line": 44, "col": 5, "end_line": 44, "end_col": 13, "operator": "constant", "context": "", "original": "\"is not\"", "replacement": "\"\"", "expression_before": "\"is not\"", "expression_after": "\"\"", "source_line": "    \"is not\": \"is\",", "mutated_line": "    \"\": \"is\",", "description": "string 'is not' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_every_comparison_operator", "cached": false}, {"id": "4345b3658d13", "path": "fang/mutators.py", "line": 50, "col": 20, "end_line": 50, "end_col": 23, "operator": "constant", "context": "", "original": "\"-\"", "replacement": "\"\"", "expression_before": "\"-\"", "expression_after": "\"\"", "source_line": "    ast.Add: (\"+\", \"-\"),", "mutated_line": "    ast.Add: (\"+\", \"\"),", "description": "string '-' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_every_arithmetic_operator", "cached": false}, {"id": "ee563698cad3", "path": "fang/mutators.py", "line": 59, "col": 15, "end_line": 59, "end_col": 19, "operator": "constant", "context": "", "original": "\"-=\"", "replacement": "\"\"", "expression_before": "\"-=\"", "expression_after": "\"\"", "source_line": "    ast.Sub: (\"-=\", \"+=\"),", "mutated_line": "    ast.Sub: (\"\", \"+=\"),", "description": "string '-=' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.266, "killer": "tests.test_mutators.TestMutators.test_every_arithmetic_operator", "cached": false}, {"id": "c9fa76f4746d", "path": "fang/mutators.py", "line": 61, "col": 15, "end_line": 61, "end_col": 19, "operator": "constant", "context": "", "original": "\"/=\"", "replacement": "\"\"", "expression_before": "\"/=\"", "expression_after": "\"\"", "source_line": "    ast.Div: (\"/=\", \"*=\"),", "mutated_line": "    ast.Div: (\"\", \"*=\"),", "description": "string '/=' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_every_arithmetic_operator", "cached": false}, {"id": "ab95537f7bec", "path": "fang/mutators.py", "line": 61, "col": 21, "end_line": 61, "end_col": 25, "operator": "constant", "context": "", "original": "\"*=\"", "replacement": "\"\"", "expression_before": "\"*=\"", "expression_after": "\"\"", "source_line": "    ast.Div: (\"/=\", \"*=\"),", "mutated_line": "    ast.Div: (\"/=\", \"\"),", "description": "string '*=' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.266, "killer": "tests.test_mutators.TestMutators.test_every_arithmetic_operator", "cached": false}, {"id": "20ffa02ad563", "path": "fang/mutators.py", "line": 66, "col": 5, "end_line": 66, "end_col": 63, "operator": "constant", "context": "", "original": "r\"\\bnot\\s+in\\b|\\bis\\s+not\\b|==|!=|<=|>=|<|>|\\bin\\b|\\bis\\b\"", "replacement": "\"\"", "expression_before": "r\"\\bnot\\s+in\\b|\\bis\\s+not\\b|==|!=|<=|>=|<|>|\\bin\\b|\\bis\\b\"", "expression_after": "\"\"", "source_line": "    r\"\\bnot\\s+in\\b|\\bis\\s+not\\b|==|!=|<=|>=|<|>|\\bin\\b|\\bis\\b\"", "mutated_line": "    \"\"", "description": "string '\\\\bnot\\\\s+in\\\\b|\\\\bis\\\\s+not... -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_mutated_line", "cached": false}, {"id": "df389720928e", "path": "fang/mutators.py", "line": 71, "col": 19, "end_line": 71, "end_col": 76, "operator": "constant", "context": "", "original": "\"Add a test at the boundary where this comparison flips.\"", "replacement": "\"\"", "expression_before": "\"Add a test at the boundary where this comparison flips.\"", "expression_after": "\"\"", "source_line": "    \"comparison\": \"Add a test at the boundary where this comparison flips.\",", "mutated_line": "    \"comparison\": \"\",", "description": "string 'Add a test at the boundary w... -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.266, "killer": "tests.test_mutators.TestMutators.test_descriptions_and_hints_are_present", "cached": false}, {"id": "1192094e043b", "path": "fang/mutators.py", "line": 75, "col": 5, "end_line": 75, "end_col": 13, "operator": "constant", "context": "", "original": "\"return\"", "replacement": "\"\"", "expression_before": "\"return\"", "expression_after": "\"\"", "source_line": "    \"return\": \"Assert the return value; calling the function is not enough.\",", "mutated_line": "    \"\": \"Assert the return value; calling the function is not enough.\",", "description": "string 'return' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_descriptions_and_hints_are_present", "cached": false}, {"id": "6bc583cd12e4", "path": "fang/mutators.py", "line": 112, "col": 42, "end_line": 112, "end_col": 45, "operator": "boolean", "context": "_MutationFactory._collect_docstrings", "original": "and", "replacement": "or", "expression_before": "isinstance(node, holders) and node.body", "expression_after": "isinstance(node, holders) or node.body", "source_line": "            if isinstance(node, holders) and node.body:", "mutated_line": "            if isinstance(node, holders) or node.body:", "description": "`and` -> `or` in `isinstance(node, holders) and node.body`", "hint": "Cover a case where only one operand is true.", "status": "killed", "duration": 0.203, "killer": "tests.test_mutators.TestMutators.test_all_mutants_compile", "cached": false}, {"id": "8947885b62fc", "path": "fang/mutators.py", "line": 115, "col": 21, "end_line": 117, "end_col": 59, "operator": "conditional", "context": "_MutationFactory._collect_docstrings", "original": "isinstance(first, ast.Expr)\n                    and isinstance(first.value, ast.Constant)\n                    and isinstance(first.value.value, str)", "replacement": "not (isinstance(first, ast.Expr)\n                    and isinstance(first.value, ast.Constant)\n                    and isinstance(first.value.value, str))", "expression_before": "isinstance(first, ast.Expr)\n                    and isinstance(first.value, ast.Constant)\n                    and isinstance(first.value.value, str)", "expression_after": "not (isinstance(first, ast.Expr)\n                    and isinstance(first.value, ast.Constant)\n                    and isinstance(first.value.value, str))", "source_line": "                    isinstance(first, ast.Expr)", "mutated_line": null, "description": "negate condition `isinstance(first, ast.Expr) and isinstance(first.value, ast.C...`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.218, "killer": "tests.test_mutators.TestMutators.test_all_mutants_compile", "cached": false}, {"id": "9014cb470fc1", "path": "fang/mutators.py", "line": 122, "col": 16, "end_line": 122, "end_col": 19, "operator": "constant", "context": "_MutationFactory._context_name", "original": "\".\"", "replacement": "\"\"", "expression_before": "\".\"", "expression_after": "\"\"", "source_line": "        return \".\".join(self.context)", "mutated_line": "        return \"\".join(self.context)", "description": "string '.' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_context_is_dotted", "cached": false}, {"id": "49238a111af4", "path": "fang/mutators.py", "line": 125, "col": 28, "end_line": 125, "end_col": 30, "operator": "comparison", "context": "_MutationFactory._in_scope", "original": "is", "replacement": "is not", "expression_before": "self.only_lines is None", "expression_after": "self.only_lines is not None", "source_line": "        if self.only_lines is None:", "mutated_line": "        if self.only_lines is not None:", "description": "`is` -> `is not` in `self.only_lines is None`", "hint": "Add a test at the boundary where this comparison flips.", "status": "killed", "duration": 0.203, "killer": "tests.test_mutators.TestMutators.test_all_mutants_compile", "cached": false}, {"id": "ce5c6ca3fd41", "path": "fang/mutators.py", "line": 129, "col": 9, "end_line": 129, "end_col": 79, "operator": "return", "context": "_MutationFactory._in_scope", "original": "return any(line in self.only_lines for line in range(first, last + 1))", "replacement": "return None", "expression_before": "return any(line in self.only_lines for line in range(first, last + 1))", "expression_after": "return None", "source_line": "        return any(line in self.only_lines for line in range(first, last + 1))", "mutated_line": "        return None", "description": "`return any(line in self.only_lines for line in range(first, l...` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "killed", "duration": 0.281, "killer": "tests.test_mutators.TestMutators.test_only_lines_filters", "cached": false}, {"id": "26673c7ee041", "path": "fang/mutators.py", "line": 144, "col": 13, "end_line": 144, "end_col": 25, "operator": "return", "context": "_MutationFactory._add", "original": "return False", "replacement": "return None", "expression_before": "return False", "expression_after": "return None", "source_line": "            return False", "mutated_line": "            return None", "description": "`return False` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "survived", "duration": 0.281, "killer": null, "cached": false}, {"id": "ada01f9dac50", "path": "fang/mutators.py", "line": 149, "col": 13, "end_line": 149, "end_col": 25, "operator": "return", "context": "_MutationFactory._add", "original": "return False", "replacement": "return None", "expression_before": "return False", "expression_after": "return None", "source_line": "            return False", "mutated_line": "            return None", "description": "`return False` -> `return None`", "hint": "Assert the return value; calling the function is not enough.", "status": "survived", "duration": 0.265, "killer": null, "cached": false}, {"id": "c91532656486", "path": "fang/mutators.py", "line": 156, "col": 67, "end_line": 156, "end_col": 71, "operator": "constant", "context": "_MutationFactory._add", "original": "True", "replacement": "False", "expression_before": "True", "expression_after": "False", "source_line": "            compile(candidate, self.sf.path, \"exec\", dont_inherit=True)", "mutated_line": "            compile(candidate, self.sf.path, \"exec\", dont_inherit=False)", "description": "`True` -> `False`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.25, "killer": null, "cached": false}, {"id": "4cb4b413ff4c", "path": "fang/mutators.py", "line": 158, "col": 20, "end_line": 158, "end_col": 25, "operator": "constant", "context": "_MutationFactory._add", "original": "False", "replacement": "True", "expression_before": "False", "expression_after": "True", "source_line": "            return False", "mutated_line": "            return True", "description": "`False` -> `True`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.25, "killer": null, "cached": false}, {"id": "72c789a5e6e4", "path": "fang/mutators.py", "line": 169, "col": 12, "end_line": 169, "end_col": 28, "operator": "conditional", "context": "_MutationFactory._add", "original": "line == end_line", "replacement": "not (line == end_line)", "expression_before": "line == end_line", "expression_after": "not (line == end_line)", "source_line": "        if line == end_line:", "mutated_line": "        if not (line == end_line):", "description": "negate condition `line == end_line`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.266, "killer": "tests.test_mutators.TestMutators.test_mutated_line", "cached": false}, {"id": "4f27ae7540a0", "path": "fang/mutators.py", "line": 172, "col": 17, "end_line": 172, "end_col": 18, "operator": "arithmetic", "context": "_MutationFactory._add", "original": "+", "replacement": "-", "expression_before": "source_line[: col - 1]\n                + replacement", "expression_after": "source_line[: col - 1]\n                - replacement", "source_line": "                + replacement", "mutated_line": "                - replacement", "description": "`+` -> `-` in `source_line[: col - 1] + replacement`", "hint": "Assert the exact numeric result, not just its type.", "status": "killed", "duration": 0.219, "killer": "tests.test_mutators.TestMutators.test_all_mutants_compile", "cached": false}, {"id": "b8acaa81cfa9", "path": "fang/mutators.py", "line": 227, "col": 22, "end_line": 227, "end_col": 23, "operator": "arithmetic", "context": "_MutationFactory._find_text_between", "original": "+", "replacement": "-", "expression_before": "start + index", "expression_after": "start - index", "source_line": "        return start + index, start + index + len(needle), needle", "mutated_line": "        return start - index, start + index + len(needle), needle", "description": "`+` -> `-` in `start + index`", "hint": "Assert the exact numeric result, not just its type.", "status": "killed", "duration": 0.281, "killer": "tests.test_mutators.TestMutators.test_every_arithmetic_operator", "cached": false}, {"id": "e37173d9999f", "path": "fang/mutators.py", "line": 268, "col": 99, "end_line": 268, "end_col": 103, "operator": "constant", "context": "_MutationFactory.visit_Assign", "original": "\"__\"", "replacement": "\"\"", "expression_before": "\"__\"", "expression_after": "\"\"", "source_line": "            if isinstance(target, ast.Name) and target.id.startswith(\"__\") and target.id.endswith(\"__\"):", "mutated_line": "            if isinstance(target, ast.Name) and target.id.startswith(\"__\") and target.id.endswith(\"\"):", "description": "string '__' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.266, "killer": null, "cached": false}, {"id": "b87b1b3aa74d", "path": "fang/mutators.py", "line": 276, "col": 13, "end_line": 276, "end_col": 35, "operator": "statement", "context": "_MutationFactory.visit_AnnAssign", "original": "self.visit(node.value)", "replacement": "pass", "expression_before": "self.visit(node.value)", "expression_after": "pass", "source_line": "            self.visit(node.value)", "mutated_line": "            pass", "description": "remove `self.visit(node.value)`", "hint": "Assert the side effect of this call (state, output, or log).", "status": "survived", "duration": 0.281, "killer": null, "cached": false}, {"id": "60881c52e52b", "path": "fang/mutators.py", "line": 281, "col": 20, "end_line": 281, "end_col": 25, "operator": "constant", "context": "_MutationFactory._is_main_guard", "original": "False", "replacement": "True", "expression_before": "False", "expression_after": "True", "source_line": "            return False", "mutated_line": "            return True", "description": "`False` -> `True`", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_mutated_line", "cached": false}, {"id": "de0f4bb4acba", "path": "fang/mutators.py", "line": 283, "col": 20, "end_line": 283, "end_col": 25, "operator": "constant", "context": "_MutationFactory._is_main_guard", "original": "False", "replacement": "True", "expression_before": "False", "expression_after": "True", "source_line": "            return False", "mutated_line": "            return True", "description": "`False` -> `True`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.25, "killer": null, "cached": false}, {"id": "267c21ad1f74", "path": "fang/mutators.py", "line": 285, "col": 101, "end_line": 285, "end_col": 103, "operator": "comparison", "context": "_MutationFactory._is_main_guard", "original": "==", "replacement": "!=", "expression_before": "comparator.value == \"__main__\"", "expression_after": "comparator.value != \"__main__\"", "source_line": "            if isinstance(op, ast.Eq) and isinstance(comparator, ast.Constant) and comparator.value == \"__main__\":", "mutated_line": "            if isinstance(op, ast.Eq) and isinstance(comparator, ast.Constant) and comparator.value != \"__main__\":", "description": "`==` -> `!=` in `comparator.value == \"__main__\"`", "hint": "Add a test at the boundary where this comparison flips.", "status": "killed", "duration": 0.282, "killer": "tests.test_mutators.TestMutators.test_skips_docstrings_main_guard_and_imports", "cached": false}, {"id": "fb7b04bbd8bd", "path": "fang/mutators.py", "line": 286, "col": 24, "end_line": 286, "end_col": 28, "operator": "constant", "context": "_MutationFactory._is_main_guard", "original": "True", "replacement": "False", "expression_before": "True", "expression_after": "False", "source_line": "                return True", "mutated_line": "                return False", "description": "`True` -> `False`", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.281, "killer": "tests.test_mutators.TestMutators.test_skips_docstrings_main_guard_and_imports", "cached": false}, {"id": "cb8ab76f4ec1", "path": "fang/mutators.py", "line": 320, "col": 13, "end_line": 320, "end_col": 36, "operator": "constant", "context": "_MutationFactory._consider_condition", "original": "\"negate condition `%s`\"", "replacement": "\"\"", "expression_before": "\"negate condition `%s`\"", "expression_after": "\"\"", "source_line": "            \"negate condition `%s`\" % truncate(source, 64),", "mutated_line": "            \"\" % truncate(source, 64),", "description": "string 'negate condition `%s`' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.219, "killer": "tests.test_mutators.TestMutators.test_all_mutants_compile", "cached": false}, {"id": "5b21c77e5d72", "path": "fang/mutators.py", "line": 320, "col": 56, "end_line": 320, "end_col": 58, "operator": "constant", "context": "_MutationFactory._consider_condition", "original": "64", "replacement": "65", "expression_before": "64", "expression_after": "65", "source_line": "            \"negate condition `%s`\" % truncate(source, 64),", "mutated_line": "            \"negate condition `%s`\" % truncate(source, 65),", "description": "`64` -> `65`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.266, "killer": null, "cached": false}, {"id": "7ff8f4932ba0", "path": "fang/mutators.py", "line": 330, "col": 79, "end_line": 330, "end_col": 80, "operator": "constant", "context": "_MutationFactory.visit_Compare", "original": "1", "replacement": "0", "expression_before": "1", "expression_after": "0", "source_line": "                found = self._token_between(operands[index], operands[index + 1], _COMPARE_PATTERN)", "mutated_line": "                found = self._token_between(operands[index], operands[index + 0], _COMPARE_PATTERN)", "description": "`1` -> `0`", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.266, "killer": "tests.test_mutators.TestMutators.test_mutated_line", "cached": false}, {"id": "60d5761ad259", "path": "fang/mutators.py", "line": 337, "col": 32, "end_line": 337, "end_col": 34, "operator": "comparison", "context": "_MutationFactory.visit_Compare", "original": "is", "replacement": "is not", "expression_before": "replacement is None", "expression_after": "replacement is not None", "source_line": "                if replacement is None:", "mutated_line": "                if replacement is not None:", "description": "`is` -> `is not` in `replacement is None`", "hint": "Add a test at the boundary where this comparison flips.", "status": "killed", "duration": 0.265, "killer": "tests.test_mutators.TestMutators.test_mutated_line", "cached": false}, {"id": "3c04a5d4e0e6", "path": "fang/mutators.py", "line": 339, "col": 17, "end_line": 347, "end_col": 18, "operator": "statement", "context": "_MutationFactory.visit_Compare", "original": "self._add(\n                    \"comparison\",\n                    start,\n                    end,\n                    replacement,\n                    node,\n                    \"`%s` -> `%s` in `%s`\"\n                    % (token, replacement, truncate(self.sf.segment(node), 64)),\n                )", "replacement": "pass", "expression_before": "self._add(\n                    \"comparison\",\n                    start,\n                    end,\n                    replacement,\n                    node,\n                    \"`%s` -> `%s` in `%s`\"\n                    % (token, replacement, truncate(self.sf.segment(node), 64)),\n                )", "expression_after": "pass", "source_line": "                self._add(", "mutated_line": null, "description": "remove `self._add( \"comparison\", start, end, replacement, node, \"`%s`...`", "hint": "Assert the side effect of this call (state, output, or log).", "status": "killed", "duration": 0.266, "killer": "tests.test_mutators.TestMutators.test_mutated_line", "cached": false}, {"id": "17f847294b81", "path": "fang/mutators.py", "line": 351, "col": 22, "end_line": 351, "end_col": 24, "operator": "comparison", "context": "_MutationFactory.visit_BoolOp", "original": "in", "replacement": "not in", "expression_before": "\"boolean\" in self.operators", "expression_after": "\"boolean\" not in self.operators", "source_line": "        if \"boolean\" in self.operators:", "mutated_line": "        if \"boolean\" not in self.operators:", "description": "`in` -> `not in` in `\"boolean\" in self.operators`", "hint": "Add a test at the boundary where this comparison flips.", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_boolean_operators", "cached": false}, {"id": "a2bfa31e179b", "path": "fang/mutators.py", "line": 353, "col": 27, "end_line": 353, "end_col": 31, "operator": "constant", "context": "_MutationFactory.visit_BoolOp", "original": "\"or\"", "replacement": "\"\"", "expression_before": "\"or\"", "expression_after": "\"\"", "source_line": "            replacement = \"or\" if token == \"and\" else \"and\"", "mutated_line": "            replacement = \"\" if token == \"and\" else \"and\"", "description": "string 'or' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.281, "killer": "tests.test_mutators.TestMutators.test_boolean_operators", "cached": false}, {"id": "6e3bae3b6425", "path": "fang/mutators.py", "line": 355, "col": 83, "end_line": 355, "end_col": 84, "operator": "arithmetic", "context": "_MutationFactory.visit_BoolOp", "original": "+", "replacement": "-", "expression_before": "index + 1", "expression_after": "index - 1", "source_line": "                found = self._token_between(node.values[index], node.values[index + 1], _BOOL_PATTERN)", "mutated_line": "                found = self._token_between(node.values[index], node.values[index - 1], _BOOL_PATTERN)", "description": "`+` -> `-` in `index + 1`", "hint": "Assert the exact numeric result, not just its type.", "status": "survived", "duration": 0.282, "killer": null, "cached": false}, {"id": "42aacda09a73", "path": "fang/mutators.py", "line": 361, "col": 17, "end_line": 369, "end_col": 18, "operator": "statement", "context": "_MutationFactory.visit_BoolOp", "original": "self._add(\n                    \"boolean\",\n                    start,\n                    end,\n                    replacement,\n                    node,\n                    \"`%s` -> `%s` in `%s`\"\n                    % (token, replacement, truncate(self.sf.segment(node), 64)),\n                )", "replacement": "pass", "expression_before": "self._add(\n                    \"boolean\",\n                    start,\n                    end,\n                    replacement,\n                    node,\n                    \"`%s` -> `%s` in `%s`\"\n                    % (token, replacement, truncate(self.sf.segment(node), 64)),\n                )", "expression_after": "pass", "source_line": "                self._add(", "mutated_line": null, "description": "remove `self._add( \"boolean\", start, end, replacement, node, \"`%s` ->...`", "hint": "Assert the side effect of this call (state, output, or log).", "status": "killed", "duration": 0.282, "killer": "tests.test_mutators.TestMutators.test_boolean_operators", "cached": false}, {"id": "ea526f16167c", "path": "fang/mutators.py", "line": 376, "col": 16, "end_line": 376, "end_col": 21, "operator": "conditional", "context": "_MutationFactory.visit_BinOp", "original": "found", "replacement": "not (found)", "expression_before": "found", "expression_after": "not (found)", "source_line": "            if found:", "mutated_line": "            if not (found):", "description": "negate condition `found`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.266, "killer": "tests.test_mutators.TestMutators.test_every_arithmetic_operator", "cached": false}, {"id": "9fbca6d89cec", "path": "fang/mutators.py", "line": 387, "col": 9, "end_line": 387, "end_col": 33, "operator": "statement", "context": "_MutationFactory.visit_BinOp", "original": "self.generic_visit(node)", "replacement": "pass", "expression_before": "self.generic_visit(node)", "expression_after": "pass", "source_line": "        self.generic_visit(node)", "mutated_line": "        pass", "description": "remove `self.generic_visit(node)`", "hint": "Assert the side effect of this call (state, output, or log).", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_every_arithmetic_operator", "cached": false}, {"id": "fa20ba60d7c7", "path": "fang/mutators.py", "line": 406, "col": 42, "end_line": 406, "end_col": 45, "operator": "boolean", "context": "_MutationFactory.visit_UnaryOp", "original": "and", "replacement": "or", "expression_before": "isinstance(node.op, ast.USub) and \"arithmetic\" in self.operators", "expression_after": "isinstance(node.op, ast.USub) or \"arithmetic\" in self.operators", "source_line": "        if isinstance(node.op, ast.USub) and \"arithmetic\" in self.operators:", "mutated_line": "        if isinstance(node.op, ast.USub) or \"arithmetic\" in self.operators:", "description": "`and` -> `or` in `isinstance(node.op, ast.USub) and \"arithmetic\" in self.operators`", "hint": "Cover a case where only one operand is true.", "status": "killed", "duration": 0.282, "killer": "tests.test_mutators.TestMutators.test_boolean_operators", "cached": false}, {"id": "168c1e9837bb", "path": "fang/mutators.py", "line": 415, "col": 107, "end_line": 415, "end_col": 109, "operator": "constant", "context": "_MutationFactory.visit_UnaryOp", "original": "48", "replacement": "49", "expression_before": "48", "expression_after": "49", "source_line": "                \"remove negation: `%s` -> `%s`\" % (truncate(self.sf.segment(node), 48), truncate(operand, 48)),", "mutated_line": "                \"remove negation: `%s` -> `%s`\" % (truncate(self.sf.segment(node), 48), truncate(operand, 49)),", "description": "`48` -> `49`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.281, "killer": null, "cached": false}, {"id": "61d3a0f1d9e7", "path": "fang/mutators.py", "line": 417, "col": 47, "end_line": 417, "end_col": 56, "operator": "constant", "context": "_MutationFactory.visit_UnaryOp", "original": "\"boolean\"", "replacement": "\"\"", "expression_before": "\"boolean\"", "expression_after": "\"\"", "source_line": "        elif isinstance(node.op, ast.Not) and \"boolean\" in self.operators:", "mutated_line": "        elif isinstance(node.op, ast.Not) and \"\" in self.operators:", "description": "string 'boolean' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.265, "killer": "tests.test_mutators.TestMutators.test_boolean_operators", "cached": false}, {"id": "a6c83a4a743c", "path": "fang/mutators.py", "line": 426, "col": 58, "end_line": 426, "end_col": 60, "operator": "constant", "context": "_MutationFactory.visit_UnaryOp", "original": "64", "replacement": "65", "expression_before": "64", "expression_after": "65", "source_line": "                \"remove `not`: `%s`\" % truncate(operand, 64),", "mutated_line": "                \"remove `not`: `%s`\" % truncate(operand, 65),", "description": "`64` -> `65`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.282, "killer": null, "cached": false}, {"id": "0fe8953adb16", "path": "fang/mutators.py", "line": 428, "col": 9, "end_line": 428, "end_col": 33, "operator": "statement", "context": "_MutationFactory.visit_UnaryOp", "original": "self.generic_visit(node)", "replacement": "pass", "expression_before": "self.generic_visit(node)", "expression_after": "pass", "source_line": "        self.generic_visit(node)", "mutated_line": "        pass", "description": "remove `self.generic_visit(node)`", "hint": "Assert the side effect of this call (state, output, or log).", "status": "survived", "duration": 0.296, "killer": null, "cached": false}, {"id": "76200d0b3b29", "path": "fang/mutators.py", "line": 433, "col": 49, "end_line": 433, "end_col": 52, "operator": "boolean", "context": "_MutationFactory.visit_Return", "original": "and", "replacement": "or", "expression_before": "isinstance(node.value, ast.Constant) and node.value.value is None", "expression_after": "isinstance(node.value, ast.Constant) or node.value.value is None", "source_line": "        if isinstance(node.value, ast.Constant) and node.value.value is None:", "mutated_line": "        if isinstance(node.value, ast.Constant) or node.value.value is None:", "description": "`and` -> `or` in `isinstance(node.value, ast.Constant) and node.value.value is ...`", "hint": "Cover a case where only one operand is true.", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_all_mutants_compile", "cached": false}, {"id": "3be844fa70a7", "path": "fang/mutators.py", "line": 435, "col": 25, "end_line": 435, "end_col": 28, "operator": "boolean", "context": "_MutationFactory.visit_Return", "original": "and", "replacement": "or", "expression_before": "self.context and self.context[-1] == \"__init__\"", "expression_after": "self.context or self.context[-1] == \"__init__\"", "source_line": "        if self.context and self.context[-1] == \"__init__\":", "mutated_line": "        if self.context or self.context[-1] == \"__init__\":", "description": "`and` -> `or` in `self.context and self.context[-1] == \"__init__\"`", "hint": "Cover a case where only one operand is true.", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_all_mutants_compile", "cached": false}, {"id": "b348828dc053", "path": "fang/mutators.py", "line": 438, "col": 52, "end_line": 438, "end_col": 54, "operator": "constant", "context": "_MutationFactory.visit_Return", "original": "64", "replacement": "65", "expression_before": "64", "expression_after": "65", "source_line": "        source = truncate(self.sf.text[start:end], 64)", "mutated_line": "        source = truncate(self.sf.text[start:end], 65)", "description": "`64` -> `65`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.266, "killer": null, "cached": false}, {"id": "a8f927b714f5", "path": "fang/mutators.py", "line": 440, "col": 13, "end_line": 440, "end_col": 21, "operator": "constant", "context": "_MutationFactory.visit_Return", "original": "\"return\"", "replacement": "\"\"", "expression_before": "\"return\"", "expression_after": "\"\"", "source_line": "            \"return\",", "mutated_line": "            \"\",", "description": "string 'return' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.235, "killer": "tests.test_mutators.TestMutators.test_operators_present", "cached": false}, {"id": "e2cd5c53ecbc", "path": "fang/mutators.py", "line": 445, "col": 13, "end_line": 445, "end_col": 36, "operator": "constant", "context": "_MutationFactory.visit_Return", "original": "\"`%s` -> `return None`\"", "replacement": "\"\"", "expression_before": "\"`%s` -> `return None`\"", "expression_after": "\"\"", "source_line": "            \"`%s` -> `return None`\" % source,", "mutated_line": "            \"\" % source,", "description": "string '`%s` -> `return None`' -> \"\"", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.235, "killer": "tests.test_mutators.TestMutators.test_all_mutants_compile", "cached": false}, {"id": "802f3bc7e71b", "path": "fang/mutators.py", "line": 450, "col": 12, "end_line": 450, "end_col": 75, "operator": "conditional", "context": "_MutationFactory.visit_Constant", "original": "\"constant\" not in self.operators or id(node) in self.docstrings", "replacement": "not (\"constant\" not in self.operators or id(node) in self.docstrings)", "expression_before": "\"constant\" not in self.operators or id(node) in self.docstrings", "expression_after": "not (\"constant\" not in self.operators or id(node) in self.docstrings)", "source_line": "        if \"constant\" not in self.operators or id(node) in self.docstrings:", "mutated_line": "        if not (\"constant\" not in self.operators or id(node) in self.docstrings):", "description": "negate condition `\"constant\" not in self.operators or id(node) in self.docstrings`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.25, "killer": "tests.test_mutators.TestMutators.test_empty_string_and_bytes_constants", "cached": false}, {"id": "f790f25c423d", "path": "fang/mutators.py", "line": 453, "col": 12, "end_line": 453, "end_col": 46, "operator": "conditional", "context": "_MutationFactory.visit_Constant", "original": "value is None or value is Ellipsis", "replacement": "not (value is None or value is Ellipsis)", "expression_before": "value is None or value is Ellipsis", "expression_after": "not (value is None or value is Ellipsis)", "source_line": "        if value is None or value is Ellipsis:", "mutated_line": "        if not (value is None or value is Ellipsis):", "description": "negate condition `value is None or value is Ellipsis`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.266, "killer": "tests.test_mutators.TestMutators.test_empty_string_and_bytes_constants", "cached": false}, {"id": "54f6fe66237a", "path": "fang/mutators.py", "line": 453, "col": 26, "end_line": 453, "end_col": 28, "operator": "boolean", "context": "_MutationFactory.visit_Constant", "original": "or", "replacement": "and", "expression_before": "value is None or value is Ellipsis", "expression_after": "value is None and value is Ellipsis", "source_line": "        if value is None or value is Ellipsis:", "mutated_line": "        if value is None and value is Ellipsis:", "description": "`or` -> `and` in `value is None or value is Ellipsis`", "hint": "Cover a case where only one operand is true.", "status": "survived", "duration": 0.266, "killer": null, "cached": false}, {"id": "cd309383921c", "path": "fang/mutators.py", "line": 459, "col": 58, "end_line": 459, "end_col": 60, "operator": "comparison", "context": "_MutationFactory.visit_Constant", "original": "==", "replacement": "!=", "expression_before": "value == 1", "expression_after": "value != 1", "source_line": "            new_value = 1 if value == 0 else (0 if value == 1 else value + 1)", "mutated_line": "            new_value = 1 if value == 0 else (0 if value != 1 else value + 1)", "description": "`==` -> `!=` in `value == 1`", "hint": "Add a test at the boundary where this comparison flips.", "status": "survived", "duration": 0.282, "killer": null, "cached": false}, {"id": "ed3a3840496d", "path": "fang/mutators.py", "line": 463, "col": 25, "end_line": 463, "end_col": 28, "operator": "constant", "context": "_MutationFactory.visit_Constant", "original": "1.0", "replacement": "2.0", "expression_before": "1.0", "expression_after": "2.0", "source_line": "            new_value = 1.0 if value == 0.0 else value + 1.0", "mutated_line": "            new_value = 2.0 if value == 0.0 else value + 1.0", "description": "`1.0` -> `2.0`", "hint": "Assert against a different value so this constant is observable.", "status": "killed", "duration": 0.265, "killer": "tests.test_mutators.TestMutators.test_empty_string_and_bytes_constants", "cached": false}, {"id": "b63bdc6d6451", "path": "fang/mutators.py", "line": 484, "col": 16, "end_line": 484, "end_col": 51, "operator": "conditional", "context": "_MutationFactory.visit_Expr", "original": "name.lower() not in self.skip_calls", "replacement": "not (name.lower() not in self.skip_calls)", "expression_before": "name.lower() not in self.skip_calls", "expression_after": "not (name.lower() not in self.skip_calls)", "source_line": "            if name.lower() not in self.skip_calls:", "mutated_line": "            if not (name.lower() not in self.skip_calls):", "description": "negate condition `name.lower() not in self.skip_calls`", "hint": "Test the branch this condition guards, not only the happy path.", "status": "killed", "duration": 0.234, "killer": "tests.test_mutators.TestMutators.test_multiline_statement_removal", "cached": false}, {"id": "bad72e7b4643", "path": "fang/mutators.py", "line": 500, "col": 20, "end_line": 500, "end_col": 22, "operator": "constant", "context": "_short_repr", "original": "32", "replacement": "33", "expression_before": "32", "expression_after": "33", "source_line": "    if len(text) > 32:", "mutated_line": "    if len(text) > 33:", "description": "`32` -> `33`", "hint": "Assert against a different value so this constant is observable.", "status": "survived", "duration": 0.265, "killer": null, "cached": false}]}</script>
+<script>
+(function(){
+  var body=document.body, cards=Array.prototype.slice.call(document.querySelectorAll('.mutant'));
+  var chips=Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
+  var q=document.getElementById('q'), count=document.getElementById('visible-count');
+  function apply(){
+    var term=(q.value||'').toLowerCase().trim(), visible=0;
+    cards.forEach(function(card){
+      var okStatus=body.dataset.filter==='all'||card.dataset.status===body.dataset.filter;
+      var okText=!term||card.dataset.search.indexOf(term)!==-1;
+      card.hidden=!(okStatus&&okText);
+      if(okStatus&&okText) visible++;
+    });
+    if(count) count.textContent=String(visible);
+  }
+  chips.forEach(function(chip){
+    chip.addEventListener('click',function(){
+      body.dataset.filter=chip.dataset.filter;
+      chips.forEach(function(c){c.setAttribute('aria-pressed',String(c===chip));});
+      apply();
+    });
+  });
+  if(q) q.addEventListener('input',apply);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='/'&&document.activeElement!==q){e.preventDefault();q.focus();}
+    if(e.key==='Escape'){q.value='';apply();q.blur();}
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'),function(btn){
+    btn.addEventListener('click',function(){
+      var text=btn.getAttribute('data-copy');
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){
+          var old=btn.textContent;btn.textContent='copied';setTimeout(function(){btn.textContent=old;},1200);
+        }).catch(function(){});
+      }
+    });
+  });
+  apply();
+})();
+</script>
+</body>
+</html>

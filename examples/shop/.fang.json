@@ -1,0 +1,7 @@
+{
+  "paths": ["shop"],
+  "tests": ["tests"],
+  "min_score": 60,
+  "sample": null,
+  "jobs": 4
+}

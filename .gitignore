@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Fang runtime
+.fang/
+fang-report.html
+fang-badge.svg
+fang-comment.md
+
+# Editors
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Virtual envs
+.venv/
+venv/
+env/

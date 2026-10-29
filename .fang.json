@@ -1,0 +1,7 @@
+{
+  "paths": ["fang"],
+  "tests": ["tests"],
+  "jobs": 4,
+  "min_score": 70,
+  "skip_calls": ["print"]
+}

@@ -1,0 +1,69 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: test (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile
+        run: python -m compileall -q fang
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Doctor
+        run: python -m fang doctor examples/shop
+
+  demo:
+    name: demo report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Mutate the demo shop
+        run: |
+          python -m fang run examples/shop --all --jobs 2 --sample 40 --min-score 20 \
+            --no-color --report fang-report.html --badge fang-badge.svg \
+            --markdown fang-comment.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fang-demo-report
+          path: |
+            fang-report.html
+            fang-badge.svg
+            fang-comment.md
+
+  self-audit:
+    name: self-audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Mutate Fang's mutation engine
+        run: |
+          python -m fang run . --all --paths fang/mutators.py \
+            --test-command "python -m unittest tests.test_mutators" \
+            --sample 30 --jobs 2 --min-score 40 --no-color \
+            --report self-audit.html --json-out self-audit.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fang-self-audit
+          path: |
+            self-audit.html
+            self-audit.json
